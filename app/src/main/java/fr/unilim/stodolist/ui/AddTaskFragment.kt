@@ -1,6 +1,5 @@
 package fr.unilim.stodolist.ui
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -79,7 +78,11 @@ class AddTaskFragment : Fragment() {
         val taskTitle = binding.etTaskTitle.text.toString().trim()
 
         if (taskTitle.isEmpty()) {
-            Toast.makeText(requireContext(), getString(R.string.enter_task_title), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.enter_task_title),
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
@@ -111,7 +114,8 @@ class AddTaskFragment : Fragment() {
                 val selectedDate = Calendar.getInstance()
                 selectedDate.set(selectedYear, selectedMonth, selectedDayOfMonth)
                 val taskDueDate = selectedDate.time
-                binding.btnPickDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(taskDueDate)
+                binding.btnPickDate.text =
+                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(taskDueDate)
             },
             year,
             month,

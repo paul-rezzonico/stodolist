@@ -12,7 +12,8 @@ class TaskViewModel(private val taskRepository: TaskRepository) : ViewModel() {
 
     fun getAllTasks(): LiveData<List<Task>> = taskRepository.getAllTasks()
 
-    fun getTasksByStatus(status: TaskStatus): LiveData<List<Task>> = taskRepository.getTasksByStatus(status)
+    fun getTasksByStatus(status: TaskStatus): LiveData<List<Task>> =
+        taskRepository.getTasksByStatus(status)
 
     fun insertTask(task: Task) = viewModelScope.launch {
         taskRepository.insertTask(task)

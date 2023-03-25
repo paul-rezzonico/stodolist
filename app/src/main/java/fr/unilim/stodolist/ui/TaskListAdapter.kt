@@ -26,7 +26,8 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
         holder.bind(task)
     }
 
-    inner class TaskViewHolder(private val binding: ItemTaskBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class TaskViewHolder(private val binding: ItemTaskBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(task: Task) {
             binding.apply {
                 tvTitle.text = task.title
@@ -36,7 +37,8 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
                     TaskStatus.COMPLETED -> "Réalisée"
                 }
                 task.dueDate?.let { dueDate ->
-                    tvDueDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dueDate);
+                    tvDueDate.text =
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dueDate)
                 } ?: run {
                     tvDueDate.text = "Pas de date limite"
                 }
