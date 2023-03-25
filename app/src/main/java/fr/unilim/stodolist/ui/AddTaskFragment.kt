@@ -19,6 +19,7 @@ import fr.unilim.stodolist.models.TaskStatus
 import fr.unilim.stodolist.repository.TaskRepository
 import fr.unilim.stodolist.viewmodel.TaskViewModel
 import fr.unilim.stodolist.viewmodel.TaskViewModelFactory
+import java.text.SimpleDateFormat
 import java.util.*
 
 class AddTaskFragment : Fragment() {
@@ -82,14 +83,22 @@ class AddTaskFragment : Fragment() {
             return
         }
 
-        val task = Task(title = taskTitle, status = TaskStatus.TODO)
+        // Get the due date from the button text
+        val dueDateString = binding.btnPickDate.text.toString()
+        val dueDate: Date? = if (dueDateString != getString(R.string.selected_due_date)) {
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            dateFormat.parse(dueDateString)
+        } else {
+            null
+        }
+
+        val task = Task(title = taskTitle, status = TaskStatus.TODO, dueDate = dueDate)
 
         taskViewModel.insertTask(task)
         Toast.makeText(requireContext(), getString(R.string.task_added), Toast.LENGTH_SHORT).show()
         activity?.onBackPressed()
     }
 
-    @SuppressLint("StringFormatInvalid")
     private fun showDatePickerDialog() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -102,7 +111,7 @@ class AddTaskFragment : Fragment() {
                 val selectedDate = Calendar.getInstance()
                 selectedDate.set(selectedYear, selectedMonth, selectedDayOfMonth)
                 val taskDueDate = selectedDate.time
-                binding.btnPickDate.text = getString(R.string.selected_due_date, selectedDayOfMonth, selectedMonth + 1, selectedYear)
+                binding.btnPickDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(taskDueDate)
             },
             year,
             month,
