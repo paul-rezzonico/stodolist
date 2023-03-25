@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.unilim.stodolist.databinding.ItemTaskBinding
 import fr.unilim.stodolist.models.Task
 import fr.unilim.stodolist.models.TaskStatus
+import java.text.SimpleDateFormat
+import java.util.*
 
 class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDiffCallback()) {
 
@@ -31,7 +33,7 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
                     TaskStatus.COMPLETED -> "Réalisée"
                 }
                 task.dueDate?.let { dueDate ->
-                    tvDueDate.text = dueDate.toString()
+                    tvDueDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dueDate);
                 } ?: run {
                     tvDueDate.text = "Pas de date limite"
                 }
