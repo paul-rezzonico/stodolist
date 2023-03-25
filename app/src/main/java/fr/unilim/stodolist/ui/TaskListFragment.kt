@@ -1,10 +1,14 @@
 package fr.unilim.stodolist.ui
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +17,7 @@ import fr.unilim.stodolist.R
 import fr.unilim.stodolist.databinding.FragmentTaskListBinding
 import androidx.navigation.fragment.findNavController
 import fr.unilim.stodolist.db.TaskDatabase
+import fr.unilim.stodolist.models.TaskStatus
 import fr.unilim.stodolist.repository.TaskRepository
 import fr.unilim.stodolist.viewmodel.TaskViewModel
 import fr.unilim.stodolist.viewmodel.TaskViewModelFactory
@@ -55,8 +60,12 @@ class TaskListFragment : Fragment() {
         binding.recyclerView.adapter = taskListAdapter
 
         taskListAdapter.onTaskUpdated = { updatedTask ->
+            if (updatedTask.status == TaskStatus.COMPLETED) {
+                showCompletedTaskDialog()
+            }
             taskViewModel.updateTask(updatedTask)
         }
+
 
         taskViewModel.getAllTasks().observe(viewLifecycleOwner) { tasks ->
             taskListAdapter.submitList(tasks)
@@ -75,6 +84,20 @@ class TaskListFragment : Fragment() {
             }
         }
     }
+
+    private fun showCompletedTaskDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.emoji_dialog)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
+
+        // Ferme le Dialog après 2 secondes
+        Handler(Looper.getMainLooper()).postDelayed({
+            dialog.dismiss()
+        }, 2000)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
