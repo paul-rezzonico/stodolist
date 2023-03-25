@@ -1,7 +1,8 @@
-package fr.unilim.stodolist
+package fr.unilim.stodolist.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import fr.unilim.stodolist.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -9,4 +10,5 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 }
+
 

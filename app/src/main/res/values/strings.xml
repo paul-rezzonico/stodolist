@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Stodolist</string>
+    <string name="add">Ajouter</string>
+    <string name="enter_task_title">Titre</string>
+    <string name="selected_due_date">Date</string>
+    <string name="task_added">Tâche ajoutée</string>
 </resources>
