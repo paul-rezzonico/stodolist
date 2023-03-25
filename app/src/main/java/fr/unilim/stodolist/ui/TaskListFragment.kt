@@ -50,6 +50,17 @@ class TaskListFragment : Fragment() {
             adapter = taskListAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+
+        val taskListAdapter = TaskListAdapter()
+        binding.recyclerView.adapter = taskListAdapter
+
+        taskListAdapter.onTaskUpdated = { updatedTask ->
+            taskViewModel.updateTask(updatedTask)
+        }
+
+        taskViewModel.getAllTasks().observe(viewLifecycleOwner) { tasks ->
+            taskListAdapter.submitList(tasks)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
