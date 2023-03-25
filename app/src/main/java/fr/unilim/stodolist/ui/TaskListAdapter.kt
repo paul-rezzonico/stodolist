@@ -1,6 +1,7 @@
 package fr.unilim.stodolist.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -41,7 +42,7 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
                 }
 
                 if (task.status == TaskStatus.COMPLETED) {
-                    btnMarkAsCompleted.isEnabled = false
+                    btnMarkAsCompleted.visibility = View.GONE
                 } else {
                     btnMarkAsCompleted.setOnClickListener {
                         val updatedTask = task.copy(status = TaskStatus.COMPLETED)
