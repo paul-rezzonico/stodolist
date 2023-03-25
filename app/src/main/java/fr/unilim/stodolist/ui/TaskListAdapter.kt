@@ -2,9 +2,11 @@ package fr.unilim.stodolist.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import fr.unilim.stodolist.R
 import fr.unilim.stodolist.databinding.ItemTaskBinding
 import fr.unilim.stodolist.models.Task
 import fr.unilim.stodolist.models.TaskStatus
@@ -37,9 +39,28 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
                 } ?: run {
                     tvDueDate.text = "Pas de date limite"
                 }
+
+                if (task.status == TaskStatus.COMPLETED) {
+                    btnMarkAsCompleted.isEnabled = false
+                } else {
+                    btnMarkAsCompleted.setOnClickListener {
+                        val updatedTask = task.copy(status = TaskStatus.COMPLETED)
+                        onTaskUpdated(updatedTask)
+                    }
+                }
+
+                // Change the background color based on the task status
+                itemView.setBackgroundColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        if (task.status == TaskStatus.COMPLETED) R.color.purple_200 else R.color.white
+                    )
+                )
             }
         }
     }
+
+    var onTaskUpdated: (Task) -> Unit = {}
 
     class TaskDiffCallback : DiffUtil.ItemCallback<Task>() {
         override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
