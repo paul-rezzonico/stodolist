@@ -1,5 +1,6 @@
 package fr.unilim.stodolist.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import fr.unilim.stodolist.models.Task
 import fr.unilim.stodolist.models.TaskStatus
@@ -8,10 +9,10 @@ import fr.unilim.stodolist.models.TaskStatus
 interface TaskDao {
 
     @Query("SELECT * FROM tasks")
-    suspend fun getAllTasks(): List<Task>
+    fun getAllTasks(): LiveData<List<Task>>
 
     @Query("SELECT * FROM tasks WHERE status = :status")
-    suspend fun getTasksByStatus(status: TaskStatus): List<Task>
+    fun getTasksByStatus(status: TaskStatus): LiveData<List<Task>>
 
     @Insert
     suspend fun insertTask(task: Task): Long
