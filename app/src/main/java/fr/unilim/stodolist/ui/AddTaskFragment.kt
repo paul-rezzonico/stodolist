@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import fr.unilim.stodolist.R
+import fr.unilim.stodolist.database.TaskDatabase
 import fr.unilim.stodolist.databinding.FragmentAddTaskBinding
-import fr.unilim.stodolist.db.TaskDatabase
 import fr.unilim.stodolist.models.Task
 import fr.unilim.stodolist.models.TaskStatus
 import fr.unilim.stodolist.repository.TaskRepository
