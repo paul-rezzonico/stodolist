@@ -1,4 +1,4 @@
-package fr.unilim.stodolist.db
+package fr.unilim.stodolist.database
 
 import android.content.Context
 import androidx.room.Database
@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import fr.unilim.stodolist.dao.TaskDao
-import fr.unilim.stodolist.database.Converters
 import fr.unilim.stodolist.models.Task
 
 @Database(entities = [Task::class], version = 1, exportSchema = false)
