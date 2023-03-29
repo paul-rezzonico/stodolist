@@ -16,8 +16,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import fr.unilim.stodolist.R
+import fr.unilim.stodolist.database.TaskDatabase
 import fr.unilim.stodolist.databinding.FragmentTaskListBinding
-import fr.unilim.stodolist.db.TaskDatabase
 import fr.unilim.stodolist.models.TaskStatus
 import fr.unilim.stodolist.repository.TaskRepository
 import fr.unilim.stodolist.viewmodel.TaskViewModel

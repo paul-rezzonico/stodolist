@@ -9,7 +9,7 @@
         android:id="@+id/taskListFragment"
         android:name="fr.unilim.stodolist.ui.TaskListFragment"
         android:label="TaskListFragment"
-        tools:layout="@layout/fragment_task_list" >
+        tools:layout="@layout/fragment_task_list">
         <action
             android:id="@+id/action_taskListFragment_to_addTaskFragment"
             app:destination="@id/addTaskFragment" />
