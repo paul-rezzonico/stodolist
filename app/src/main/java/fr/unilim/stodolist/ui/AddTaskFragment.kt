@@ -99,6 +99,7 @@ class AddTaskFragment : Fragment() {
 
         taskViewModel.insertTask(task)
         Toast.makeText(requireContext(), getString(R.string.task_added), Toast.LENGTH_SHORT).show()
+        taskViewModel.scheduleTaskNotification(requireContext(), task)
         activity?.onBackPressed()
     }
 
