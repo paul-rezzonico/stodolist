@@ -11,8 +11,6 @@ data class Task(
 
     val title: String,
 
-    val description: String? = null,
-
     val dueDate: Date? = null,
 
     val status: TaskStatus = TaskStatus.TODO
