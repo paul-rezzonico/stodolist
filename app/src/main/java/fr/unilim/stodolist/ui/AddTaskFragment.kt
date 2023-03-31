@@ -121,6 +121,10 @@ class AddTaskFragment : Fragment() {
             month,
             day
         )
+
+        // Empêcher la sélection d'une date antérieure à aujourd'hui
+        datePickerDialog.datePicker.minDate = calendar.timeInMillis
+
         datePickerDialog.show()
     }
 
