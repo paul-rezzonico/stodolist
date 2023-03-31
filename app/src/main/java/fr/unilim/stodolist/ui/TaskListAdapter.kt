@@ -31,11 +31,29 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
         fun bind(task: Task) {
             binding.apply {
                 tvTitle.text = task.title
-                tvStatus.text = when (task.status) {
+
+                // Vérifier si la tâche est en retard
+                val isLate = task.dueDate?.let { dueDate ->
+                    dueDate.before(Calendar.getInstance().time) && task.status != TaskStatus.COMPLETED
+                } ?: false
+
+                val displayStatus = when {
+                    isLate -> TaskStatus.LATE
+                    else -> task.status
+                }
+
+                if (isLate) {
+                    val updatedTask = task.copy(status = TaskStatus.LATE)
+                    onTaskUpdated(updatedTask)
+                }
+
+
+                tvStatus.text = when (displayStatus) {
                     TaskStatus.TODO -> "À faire"
                     TaskStatus.LATE -> "En retard"
                     TaskStatus.COMPLETED -> "Réalisée"
                 }
+
                 task.dueDate?.let { dueDate ->
                     tvDueDate.text =
                         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dueDate)
@@ -56,7 +74,11 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
                 itemView.setBackgroundColor(
                     ContextCompat.getColor(
                         itemView.context,
-                        if (task.status == TaskStatus.COMPLETED) R.color.purple_200 else R.color.white
+                        when (displayStatus) {
+                            TaskStatus.COMPLETED -> R.color.purple_200
+                            TaskStatus.LATE -> R.color.teal_700
+                            else -> R.color.white
+                        }
                     )
                 )
             }
