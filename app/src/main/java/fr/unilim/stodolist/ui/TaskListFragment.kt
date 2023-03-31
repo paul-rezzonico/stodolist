@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -55,10 +56,11 @@ class TaskListFragment : Fragment() {
         binding.recyclerView.apply {
             adapter = taskListAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            taskListAdapter.onTaskDeleted = { deletedTask ->
+                taskViewModel.deleteTask(deletedTask)
+                Toast.makeText(requireContext(), getString(R.string.task_deleted), Toast.LENGTH_SHORT).show()
+            }
         }
-
-        val taskListAdapter = TaskListAdapter()
-        binding.recyclerView.adapter = taskListAdapter
 
         taskListAdapter.onTaskUpdated = { updatedTask ->
             if (updatedTask.status == TaskStatus.COMPLETED) {
@@ -67,11 +69,11 @@ class TaskListFragment : Fragment() {
             taskViewModel.updateTask(updatedTask)
         }
 
-
         taskViewModel.getAllTasks().observe(viewLifecycleOwner) { tasks ->
             taskListAdapter.submitList(tasks)
         }
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
