@@ -30,6 +30,7 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
         RecyclerView.ViewHolder(binding.root) {
         fun bind(task: Task) {
             binding.apply {
+
                 tvTitle.text = task.title
 
                 // Vérifier si la tâche est en retard
@@ -70,6 +71,10 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
                     }
                 }
 
+                btnDeleteTask.setOnClickListener {
+                    onTaskDeleted(task)
+                }
+
                 // Change the background color based on the task status
                 itemView.setBackgroundColor(
                     ContextCompat.getColor(
@@ -86,6 +91,7 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
     }
 
     var onTaskUpdated: (Task) -> Unit = {}
+    var onTaskDeleted: (Task) -> Unit = {}
 
     class TaskDiffCallback : DiffUtil.ItemCallback<Task>() {
         override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {

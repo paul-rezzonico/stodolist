@@ -5,4 +5,6 @@
     <string name="selected_due_date">Date</string>
     <string name="task_added">Tâche ajoutée</string>
     <string name="add_task_button">Ajouter</string>
+    <string name="delete_task">Supprimer</string>
+    <string name="task_deleted">Tâche supprimée</string>
 </resources>
