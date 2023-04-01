@@ -79,7 +79,6 @@ class TaskListFragment : Fragment() {
         }
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.fabAddTask.setOnClickListener {
@@ -87,8 +86,9 @@ class TaskListFragment : Fragment() {
         }
 
         setupBottomNavMenu()
-        updateTaskList(currentStatusFilter)
+        setupRecyclerView()
         observeTasks()
+        updateTaskList(currentStatusFilter)
     }
 
     private fun showCompletedTaskDialog() {
@@ -131,18 +131,6 @@ class TaskListFragment : Fragment() {
             val filteredTasks = tasks.filter { task -> statusFilter.contains(task.status) }
             taskListAdapter.submitList(filteredTasks)
         }
-        binding.recyclerView.apply {
-            adapter = taskListAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-            taskListAdapter.onTaskDeleted = { deletedTask ->
-                taskViewModel.deleteTask(deletedTask)
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.task_deleted),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
     }
 
     private fun observeTasks() {
@@ -150,20 +138,7 @@ class TaskListFragment : Fragment() {
             val filteredTasks = tasks.filter { task -> currentStatusFilter.contains(task.status) }
             taskListAdapter.submitList(filteredTasks.toList())
         }
-        binding.recyclerView.apply {
-            adapter = taskListAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-            taskListAdapter.onTaskDeleted = { deletedTask ->
-                taskViewModel.deleteTask(deletedTask)
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.task_deleted),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
