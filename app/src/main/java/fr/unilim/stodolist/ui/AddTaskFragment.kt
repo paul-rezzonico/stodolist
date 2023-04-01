@@ -129,7 +129,7 @@ class AddTaskFragment : Fragment() {
                     put("model", "text-davinci-003")
                     put(
                         "prompt",
-                        "Title of the task: --- $taskTitle --- // 3 very shorts bullet points dividing the tasks to be done, in french, without numbering: "
+                        "Title of the task: --- $taskTitle --- // 3 very shorts bullet points dividing the tasks to be done, in french, without numbering (use •): "
                     )
                     put("max_tokens", 200)
                 }
