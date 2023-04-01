@@ -20,11 +20,9 @@ import fr.unilim.stodolist.viewmodel.TaskViewModel
 import fr.unilim.stodolist.viewmodel.TaskViewModelFactory
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
-import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -121,20 +119,24 @@ class AddTaskFragment : Fragment() {
 
             val data = buildJsonObject {
                 put("model", "text-davinci-003")
-                put("prompt", "Title of the task: $taskTitle // 3 very shorts bullet points dividing the tasks to be done, without numbering: ")
+                put(
+                    "prompt",
+                    "Title of the task: --- $taskTitle --- // 3 very shorts bullet points dividing the tasks to be done, in french, without numbering: "
+                )
                 put("max_tokens", 200)
             }
 
             var resultText: String? = null
 
             try {
-                val response: JsonObject = httpClient.post("https://api.openai.com/v1/completions") {
-                    headers {
-                        append("Content-Type", "application/json")
-                        append("Authorization", "Bearer $OPENAI_API_KEY")
+                val response: JsonObject =
+                    httpClient.post("https://api.openai.com/v1/completions") {
+                        headers {
+                            append("Content-Type", "application/json")
+                            append("Authorization", "Bearer $OPENAI_API_KEY")
+                        }
+                        body = data
                     }
-                    body = data
-                }
 
                 resultText = response["choices"]
                     ?.jsonArray
@@ -153,19 +155,24 @@ class AddTaskFragment : Fragment() {
                 httpClient.close()
             }
 
-            val task = Task(title = taskTitle, status = TaskStatus.TODO, description = resultText, dueDate = dueDate)
+            val task = Task(
+                title = taskTitle,
+                status = TaskStatus.TODO,
+                description = resultText,
+                dueDate = dueDate
+            )
 
 
             taskViewModel.insertTask(task)
-                activity?.runOnUiThread {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.task_added),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    taskViewModel.scheduleTaskNotification(requireContext(), task)
-                    activity?.onBackPressed()
-                }
+            activity?.runOnUiThread {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.task_added),
+                    Toast.LENGTH_SHORT
+                ).show()
+                taskViewModel.scheduleTaskNotification(requireContext(), task)
+                activity?.onBackPressed()
+            }
         }
     }
 

@@ -29,6 +29,8 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
     inner class TaskViewHolder(private val binding: ItemTaskBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(task: Task) {
+
+
             binding.apply {
 
                 tvTitle.text = task.title
@@ -58,7 +60,10 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
 
                 task.dueDate?.let { dueDate ->
                     tvDueDate.text =
-                        "Date limite : " + SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dueDate)
+                        "Date limite : " + SimpleDateFormat(
+                            "dd/MM/yyyy",
+                            Locale.getDefault()
+                        ).format(dueDate)
                 } ?: run {
                     tvDueDate.text = "Pas de date limite"
                 }

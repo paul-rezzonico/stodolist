@@ -21,5 +21,5 @@ data class Task(
 enum class TaskStatus {
     TODO,
     LATE,
-    COMPLETED
+    COMPLETED,
 }
