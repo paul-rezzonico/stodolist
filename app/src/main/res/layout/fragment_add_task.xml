@@ -13,6 +13,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
+        android:autofillHints=""
         android:hint="@string/enter_task_title"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,7 +45,8 @@
         android:checked="true"
         android:text="@string/IA_description_toggle"
         app:layout_constraintEnd_toEndOf="@+id/etTaskTitle"
-        app:layout_constraintTop_toBottomOf="@+id/btnSaveTask" />
+        app:layout_constraintTop_toBottomOf="@+id/btnSaveTask"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,4 +12,6 @@
     <string name="action_late">En retard</string>
     <string name="action_completed">Terminées</string>
     <string name="IA_description_toggle">Générer étapes par IA</string>
+    <string name="mark_completed">Finir</string>
+    <string name="animation_text">👍🎉</string>
 </resources>

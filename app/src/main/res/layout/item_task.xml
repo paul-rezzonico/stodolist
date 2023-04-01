@@ -18,35 +18,31 @@
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Title"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/tvStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Status"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <TextView
             android:id="@+id/tvDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Description"
             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
         <TextView
             android:id="@+id/tvDueDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Due date"
             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
         <Button
             android:id="@+id/btnMarkAsCompleted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Terminé"
+            android:text="@string/mark_completed"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -55,8 +51,6 @@
             android:id="@+id/btnDeleteTask"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:background="@android:color/transparent"
             android:contentDescription="@string/delete_task"
             android:src="@drawable/ic_delete" />
