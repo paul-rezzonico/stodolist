@@ -32,6 +32,7 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
             binding.apply {
 
                 tvTitle.text = task.title
+                tvDescription.text = "Description par IA : ${task.description}\n"
 
                 // Vérifier si la tâche est en retard
                 val isLate = task.dueDate?.let { dueDate ->
@@ -57,7 +58,7 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
 
                 task.dueDate?.let { dueDate ->
                     tvDueDate.text =
-                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dueDate)
+                        "Date limite : " + SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(dueDate)
                 } ?: run {
                     tvDueDate.text = "Pas de date limite"
                 }

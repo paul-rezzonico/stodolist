@@ -29,6 +29,13 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+        <TextView
             android:id="@+id/tvDueDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
