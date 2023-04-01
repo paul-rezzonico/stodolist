@@ -32,6 +32,9 @@ class TaskListFragment : Fragment() {
     private lateinit var taskViewModel: TaskViewModel
     private lateinit var taskListAdapter: TaskListAdapter
 
+    private var currentStatusFilter: List<TaskStatus> =
+        listOf(TaskStatus.TODO, TaskStatus.LATE, TaskStatus.COMPLETED)
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,7 +61,12 @@ class TaskListFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             taskListAdapter.onTaskDeleted = { deletedTask ->
                 taskViewModel.deleteTask(deletedTask)
-                Toast.makeText(requireContext(), getString(R.string.task_deleted), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.task_deleted),
+                    Toast.LENGTH_SHORT
+                ).show()
+                updateTaskList(currentStatusFilter)
             }
         }
 
@@ -67,10 +75,7 @@ class TaskListFragment : Fragment() {
                 showCompletedTaskDialog()
             }
             taskViewModel.updateTask(updatedTask)
-        }
-
-        taskViewModel.getAllTasks().observe(viewLifecycleOwner) { tasks ->
-            taskListAdapter.submitList(tasks)
+            updateTaskList(currentStatusFilter)
         }
     }
 
@@ -81,11 +86,8 @@ class TaskListFragment : Fragment() {
             findNavController().navigate(R.id.action_taskListFragment_to_addTaskFragment)
         }
 
-        taskViewModel.getAllTasks().observe(viewLifecycleOwner) { tasks ->
-            tasks?.let {
-                taskListAdapter.submitList(it)
-            }
-        }
+        setupBottomNavMenu()
+        updateTaskList(currentStatusFilter)
     }
 
     private fun showCompletedTaskDialog() {
@@ -95,10 +97,51 @@ class TaskListFragment : Fragment() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
 
-        // Ferme le Dialog après 2 secondes
+        // 1 seconde d'animation
         Handler(Looper.getMainLooper()).postDelayed({
             dialog.dismiss()
-        }, 2000)
+        }, 1000)
+    }
+
+    private fun setupBottomNavMenu() {
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.action_all -> {
+                    updateTaskList(listOf(TaskStatus.TODO, TaskStatus.LATE, TaskStatus.COMPLETED))
+                }
+                R.id.action_todo -> {
+                    updateTaskList(listOf(TaskStatus.TODO, TaskStatus.LATE))
+                }
+                R.id.action_late -> {
+                    updateTaskList(listOf(TaskStatus.LATE))
+                }
+                R.id.action_completed -> {
+                    updateTaskList(listOf(TaskStatus.COMPLETED))
+                }
+            }
+            true
+        }
+    }
+
+
+    private fun updateTaskList(statusFilter: List<TaskStatus>) {
+        currentStatusFilter = statusFilter
+        taskViewModel.getAllTasks().observe(viewLifecycleOwner) { tasks ->
+            val filteredTasks = tasks.filter { task -> statusFilter.contains(task.status) }
+            taskListAdapter.submitList(filteredTasks)
+        }
+        binding.recyclerView.apply {
+            adapter = taskListAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            taskListAdapter.onTaskDeleted = { deletedTask ->
+                taskViewModel.deleteTask(deletedTask)
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.task_deleted),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
 
