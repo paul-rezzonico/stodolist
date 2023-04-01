@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_all"
+        android:title="@string/action_all" />
+
+    <item
+        android:id="@+id/action_todo"
+        android:title="@string/action_todo" />
+
+    <item
+        android:id="@+id/action_late"
+        android:title="@string/action_late" />
+
+    <item
+        android:id="@+id/action_completed"
+        android:title="@string/action_completed" />
+
+</menu>

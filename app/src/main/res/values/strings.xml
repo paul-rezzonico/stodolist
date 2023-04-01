@@ -7,4 +7,8 @@
     <string name="add_task_button">Ajouter</string>
     <string name="delete_task">Supprimer</string>
     <string name="task_deleted">Tâche supprimée</string>
+    <string name="action_all">Toutes</string>
+    <string name="action_todo">À faire</string>
+    <string name="action_late">En retard</string>
+    <string name="action_completed">Terminées</string>
 </resources>
