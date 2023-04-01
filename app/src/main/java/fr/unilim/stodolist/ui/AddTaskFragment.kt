@@ -88,6 +88,11 @@ class AddTaskFragment : Fragment() {
     }
 
     private fun saveTask() {
+        binding.btnSaveTask.isEnabled = false
+        binding.IADescriptionToggle.isEnabled = false
+        binding.btnPickDate.isEnabled = false
+        binding.etTaskTitle.isEnabled = false
+
         val taskTitle = binding.etTaskTitle.text.toString().trim()
 
         if (taskTitle.isEmpty()) {
@@ -108,53 +113,76 @@ class AddTaskFragment : Fragment() {
             null
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val httpClient = HttpClient(CIO) {
-                install(JsonFeature) {
-                    serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
-                        ignoreUnknownKeys = true
-                    })
+        var resultText: String? = null
+
+        if (binding.IADescriptionToggle.isChecked) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val httpClient = HttpClient(CIO) {
+                    install(JsonFeature) {
+                        serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                            ignoreUnknownKeys = true
+                        })
+                    }
+                }
+
+                val data = buildJsonObject {
+                    put("model", "text-davinci-003")
+                    put(
+                        "prompt",
+                        "Title of the task: --- $taskTitle --- // 3 very shorts bullet points dividing the tasks to be done, in french, without numbering: "
+                    )
+                    put("max_tokens", 200)
+                }
+
+
+
+                try {
+                    val response: JsonObject =
+                        httpClient.post("https://api.openai.com/v1/completions") {
+                            headers {
+                                append("Content-Type", "application/json")
+                                append("Authorization", "Bearer $OPENAI_API_KEY")
+                            }
+                            body = data
+                        }
+
+                    resultText = response["choices"]
+                        ?.jsonArray
+                        ?.get(0)
+                        ?.jsonObject
+                        ?.get("text")
+                        ?.jsonPrimitive
+                        ?.content
+                        ?.replace("\"", "")
+
+                    println(resultText)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    resultText = "Indisponible"
+                } finally {
+                    httpClient.close()
+                }
+
+                val task = Task(
+                    title = taskTitle,
+                    status = TaskStatus.TODO,
+                    description = resultText,
+                    dueDate = dueDate
+                )
+
+
+                taskViewModel.insertTask(task)
+                activity?.runOnUiThread {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.task_added),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    taskViewModel.scheduleTaskNotification(requireContext(), task)
+                    activity?.onBackPressed()
                 }
             }
-
-            val data = buildJsonObject {
-                put("model", "text-davinci-003")
-                put(
-                    "prompt",
-                    "Title of the task: --- $taskTitle --- // 3 very shorts bullet points dividing the tasks to be done, in french, without numbering: "
-                )
-                put("max_tokens", 200)
-            }
-
-            var resultText: String? = null
-
-            try {
-                val response: JsonObject =
-                    httpClient.post("https://api.openai.com/v1/completions") {
-                        headers {
-                            append("Content-Type", "application/json")
-                            append("Authorization", "Bearer $OPENAI_API_KEY")
-                        }
-                        body = data
-                    }
-
-                resultText = response["choices"]
-                    ?.jsonArray
-                    ?.get(0)
-                    ?.jsonObject
-                    ?.get("text")
-                    ?.jsonPrimitive
-                    ?.content
-                    ?.replace("\"", "")
-
-                println(resultText)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                resultText = "Indisponible"
-            } finally {
-                httpClient.close()
-            }
-
+        } else {
             val task = Task(
                 title = taskTitle,
                 status = TaskStatus.TODO,
@@ -175,7 +203,6 @@ class AddTaskFragment : Fragment() {
             }
         }
     }
-
 
     private fun showDatePickerDialog() {
         val calendar = Calendar.getInstance()

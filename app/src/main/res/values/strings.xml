@@ -11,4 +11,5 @@
     <string name="action_todo">À faire</string>
     <string name="action_late">En retard</string>
     <string name="action_completed">Terminées</string>
+    <string name="IA_description_toggle">Générer étapes par IA</string>
 </resources>

@@ -80,7 +80,6 @@ class TaskListFragment : Fragment() {
     }
 
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.fabAddTask.setOnClickListener {
@@ -164,7 +163,6 @@ class TaskListFragment : Fragment() {
             }
         }
     }
-
 
 
     override fun onDestroyView() {

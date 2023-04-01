@@ -34,7 +34,11 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
             binding.apply {
 
                 tvTitle.text = task.title
-                tvDescription.text = "Description par IA : ${task.description}\n"
+                if (task.description != null) {
+                    tvDescription.text = "Étapes générées par l'IA : ${task.description}\n"
+                } else {
+                    tvDescription.visibility = View.GONE
+                }
 
                 // Vérifier si la tâche est en retard
                 val isLate = task.dueDate?.let { dueDate ->
