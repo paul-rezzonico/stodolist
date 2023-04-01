@@ -35,7 +35,7 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
 
                 tvTitle.text = task.title
                 if (task.description != null) {
-                    tvDescription.text = "Étapes générées par l'IA : ${task.description}\n"
+                    tvDescription.text = "Étapes générées par IA : ${task.description}\n"
                 } else {
                     tvDescription.visibility = View.GONE
                 }
@@ -72,13 +72,14 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
                     tvDueDate.text = "Pas de date limite"
                 }
 
-                if (task.status == TaskStatus.COMPLETED) {
-                    btnMarkAsCompleted.visibility = View.GONE
-                } else {
+                btnMarkAsCompleted.visibility = if (task.status != TaskStatus.COMPLETED) {
                     btnMarkAsCompleted.setOnClickListener {
                         val updatedTask = task.copy(status = TaskStatus.COMPLETED)
                         onTaskUpdated(updatedTask)
                     }
+                    View.VISIBLE
+                } else {
+                    View.GONE
                 }
 
                 btnDeleteTask.setOnClickListener {
