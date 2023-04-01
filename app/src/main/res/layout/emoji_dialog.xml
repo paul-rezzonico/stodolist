@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="👍🎉"
+        android:text="@string/animation_text"
         android:textSize="100sp" />
 
 </FrameLayout>
