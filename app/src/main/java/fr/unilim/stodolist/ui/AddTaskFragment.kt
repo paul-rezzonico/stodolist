@@ -18,8 +18,23 @@ import fr.unilim.stodolist.models.TaskStatus
 import fr.unilim.stodolist.repository.TaskRepository
 import fr.unilim.stodolist.viewmodel.TaskViewModel
 import fr.unilim.stodolist.viewmodel.TaskViewModelFactory
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.*
 import java.text.SimpleDateFormat
 import java.util.*
+
+
+private const val OPENAI_API_KEY = "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"
+// sera supprimée dans quelques semaines
 
 class AddTaskFragment : Fragment() {
 
@@ -95,13 +110,65 @@ class AddTaskFragment : Fragment() {
             null
         }
 
-        val task = Task(title = taskTitle, status = TaskStatus.TODO, dueDate = dueDate)
+        CoroutineScope(Dispatchers.IO).launch {
+            val httpClient = HttpClient(CIO) {
+                install(JsonFeature) {
+                    serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                        ignoreUnknownKeys = true
+                    })
+                }
+            }
 
-        taskViewModel.insertTask(task)
-        Toast.makeText(requireContext(), getString(R.string.task_added), Toast.LENGTH_SHORT).show()
-        taskViewModel.scheduleTaskNotification(requireContext(), task)
-        activity?.onBackPressed()
+            val data = buildJsonObject {
+                put("model", "text-davinci-003")
+                put("prompt", "Title of the task: $taskTitle // 3 very shorts bullet points dividing the tasks to be done, without numbering: ")
+                put("max_tokens", 200)
+            }
+
+            var resultText: String? = null
+
+            try {
+                val response: JsonObject = httpClient.post("https://api.openai.com/v1/completions") {
+                    headers {
+                        append("Content-Type", "application/json")
+                        append("Authorization", "Bearer $OPENAI_API_KEY")
+                    }
+                    body = data
+                }
+
+                resultText = response["choices"]
+                    ?.jsonArray
+                    ?.get(0)
+                    ?.jsonObject
+                    ?.get("text")
+                    ?.jsonPrimitive
+                    ?.content
+                    ?.replace("\"", "")
+
+                println(resultText)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                resultText = "Indisponible"
+            } finally {
+                httpClient.close()
+            }
+
+            val task = Task(title = taskTitle, status = TaskStatus.TODO, description = resultText, dueDate = dueDate)
+
+
+            taskViewModel.insertTask(task)
+                activity?.runOnUiThread {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.task_added),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    taskViewModel.scheduleTaskNotification(requireContext(), task)
+                    activity?.onBackPressed()
+                }
+        }
     }
+
 
     private fun showDatePickerDialog() {
         val calendar = Calendar.getInstance()
