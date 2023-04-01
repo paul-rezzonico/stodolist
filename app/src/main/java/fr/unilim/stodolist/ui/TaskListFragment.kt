@@ -66,7 +66,7 @@ class TaskListFragment : Fragment() {
                     getString(R.string.task_deleted),
                     Toast.LENGTH_SHORT
                 ).show()
-                updateTaskList(currentStatusFilter)
+                observeTasks()
             }
         }
 
@@ -75,9 +75,10 @@ class TaskListFragment : Fragment() {
                 showCompletedTaskDialog()
             }
             taskViewModel.updateTask(updatedTask)
-            updateTaskList(currentStatusFilter)
+            observeTasks()
         }
     }
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -88,6 +89,7 @@ class TaskListFragment : Fragment() {
 
         setupBottomNavMenu()
         updateTaskList(currentStatusFilter)
+        observeTasks()
     }
 
     private fun showCompletedTaskDialog() {
@@ -143,6 +145,26 @@ class TaskListFragment : Fragment() {
             }
         }
     }
+
+    private fun observeTasks() {
+        taskViewModel.getAllTasks().observe(viewLifecycleOwner) { tasks ->
+            val filteredTasks = tasks.filter { task -> currentStatusFilter.contains(task.status) }
+            taskListAdapter.submitList(filteredTasks.toList())
+        }
+        binding.recyclerView.apply {
+            adapter = taskListAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            taskListAdapter.onTaskDeleted = { deletedTask ->
+                taskViewModel.deleteTask(deletedTask)
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.task_deleted),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
 
 
     override fun onDestroyView() {
