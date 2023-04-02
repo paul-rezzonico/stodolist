@@ -2,7 +2,7 @@
     <string name="app_name">Stodolist</string>
     <string name="add">Ajouter</string>
     <string name="enter_task_title">Titre</string>
-    <string name="selected_due_date">Date</string>
+    <string name="selected_due_date">Échéance</string>
     <string name="task_added">Tâche ajoutée</string>
     <string name="add_task_button">Ajouter</string>
     <string name="delete_task">Supprimer</string>
