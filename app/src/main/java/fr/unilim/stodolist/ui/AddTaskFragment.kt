@@ -32,7 +32,8 @@ import java.util.*
 
 
 private const val OPENAI_API_KEY = "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"
-// sera supprimée dans quelques semaines
+// sera supprimé dans quelques semaines
+// limité à 1$ (y a de la marge)
 
 class AddTaskFragment : Fragment() {
 
