@@ -18,15 +18,6 @@ import fr.unilim.stodolist.models.TaskStatus
 import fr.unilim.stodolist.repository.TaskRepository
 import fr.unilim.stodolist.viewmodel.TaskViewModel
 import fr.unilim.stodolist.viewmodel.TaskViewModelFactory
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.request.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -108,12 +99,12 @@ class AddTaskFragment : Fragment() {
             null
         }
 
-        var resultText: String? = null
+        val taskDescription = binding.description.text.toString().trim()
 
         val task = Task(
             title = taskTitle,
             status = TaskStatus.TODO,
-            description = resultText,
+            description = taskDescription,
             dueDate = dueDate
         )
 
