@@ -29,7 +29,7 @@ class TaskNotificationReceiver : BroadcastReceiver() {
         }
 
         val notification = NotificationCompat.Builder(context, notificationChannelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setContentTitle("Tâche en retard ou à venir")
             .setContentText("La tâche '$taskTitle' est en retard ou arrive bientôt à expiration.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
