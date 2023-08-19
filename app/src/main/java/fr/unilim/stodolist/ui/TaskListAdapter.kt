@@ -35,7 +35,7 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TaskDi
 
                 tvTitle.text = task.title
                 if (task.description != null) {
-                    tvDescription.text = "Étapes générées par IA : ${task.description}\n"
+                    tvDescription.text = "${task.description}\n"
                 } else {
                     tvDescription.visibility = View.GONE
                 }
