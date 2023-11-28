@@ -37,9 +37,9 @@ git clone git@github.com:paul-rezzonico/stodolist.git
 
 | Skill | Description | How it's used in the project |
 | :---: | :---------: | :--------------------------: |
-| **![RNCP35475BC01](https://img.shields.io/badge/RNCP35475BC01-2-00BFFF?style=flat)** | Perform an application development | With this project, I was able to develop an android 
-| **![RNCP35475BC02](https://img.shields.io/badge/RNCP35475BC02-2-00BFFF?style=flat)** | Optimize IT applications | I used Test and Debugging techniques to ensure the application runs smoothly. |
-| **![RNCP35475BC05](https://img.shields.io/badge/RNCP35475BC05-2-00BFFF?style=flat)** | Conduct a project | We start the project by defining the requirements and the specifications. We then planned developed the application and tested it. |
+| **![RNCP35475BC01](https://img.shields.io/badge/RNCP35475BC01-2-00BFFF?style=flat)** | Perform an application development | I developped the application using Kotlin and Android Studio. I used the SQLite database to store the data. |
+| **![RNCP35475BC02](https://img.shields.io/badge/RNCP35475BC02-2-00BFFF?style=flat)** | Optimize IT applications | I used SonarLint to optimize the application, along with the best practices of the Kotlin language. |
+| **![RNCP35475BC05](https://img.shields.io/badge/RNCP35475BC05-2-00BFFF?style=flat)** | Conduct a project | We start the project by defining the requirements and the specifications. We then developed the application and tested it. | 
 | **![RNCP35475BC06](https://img.shields.io/badge/RNCP35475BC06-2-00BFFF?style=flat)** | Working in an IT team | I worked with a partner to develop this project. We used Git to manage the project. |
 
 
