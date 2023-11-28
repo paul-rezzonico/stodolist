@@ -35,12 +35,12 @@ git clone git@github.com:paul-rezzonico/stodolist.git
 
 ## RNCP skills
 
-| Skill | Description |
-| :---: | :---------: |
-| **![RNCP35475BC01](https://img.shields.io/badge/RNCP35475BC01-2-00BFFF?style=flat)** | Réaliser un développement d’application | 
-| **![RNCP35475BC02](https://img.shields.io/badge/RNCP35475BC02-2-00BFFF?style=flat)** | Optimiser des applications informatiques | 
-| **![RNCP35475BC05](https://img.shields.io/badge/RNCP35475BC03-2-00BFFF?style=flat)** | Conduire un projet
-| **![RNCP35475BC06](https://img.shields.io/badge/RNCP35475BC04-2-00BFFF?style=flat)** | Travailler dans une équipe informatique
+| Skill | Description | How it's used in the project |
+| :---: | :---------: | :--------------------------: |
+| **![RNCP35475BC01](https://img.shields.io/badge/RNCP35475BC01-2-00BFFF?style=flat)** | Perform an application development | With this project, I was able to develop an android 
+| **![RNCP35475BC02](https://img.shields.io/badge/RNCP35475BC02-2-00BFFF?style=flat)** | Optimize IT applications | I used Test and Debugging techniques to ensure the application runs smoothly. |
+| **![RNCP35475BC05](https://img.shields.io/badge/RNCP35475BC05-2-00BFFF?style=flat)** | Conduct a project | We start the project by defining the requirements and the specifications. We then planned developed the application and tested it. |
+| **![RNCP35475BC06](https://img.shields.io/badge/RNCP35475BC06-2-00BFFF?style=flat)** | Working in an IT team | I worked with a partner to develop this project. We used Git to manage the project. |
 
 
 ## Contribution
