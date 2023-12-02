@@ -54,9 +54,6 @@ This project is open to contributions from all developers. To contribute, follow
 ## License
 This project is licensed under the MIT License - see the LICENSE.md file for details.
 
-## Acknowledgements
-- This project was inspired by modern task management needs and user experience best practices.
-
 ---
 
 Thank you for your interest in Stodolist. We hope it enhances your productivity!
