@@ -1,15 +1,23 @@
 # Stodolist
 
-//TODO: Add a logo for the application. 
-
 ## Overview
-Stodolist is a simple kotlin-based task management application for Android. It allows users to create, edit, and delete tasks. It also provides reminders and notifications to keep track of deadlines.
+
+<table>
+  <tr>
+    <td>
+      <img src="https://drive.google.com/uc?export=view&id=1ENvbMzvEFKa4vGdwvBK3cV5jifuLW62f" />
+    </td>
+    <td>
+      <p>Stodolist is a simple kotlin-based task management application for Android. It allows users to create, edit, and delete tasks. It also provides reminders and notifications to keep track of deadlines.</p>
+    </td>
+  </tr>
+</table>
 
 ## Features
 - Task Creation: Users can easily create, edit, and delete tasks.
 - Notifications: Reminders and notifications to keep track of deadlines.
 - Responsive Design: The app is fully responsive, making it accessible on various devices and screen sizes.
-- Categories: Organize tasks into different categories for better management (To be implemented in future versions)
+- Categories: Organize tasks into different categories for better management
 - Search Functionality: Quickly find tasks using the search feature (To be implemented in future versions)
 
 ## Getting Started
@@ -23,7 +31,33 @@ git clone git@github.com:paul-rezzonico/stodolist.git
 4. Enjoy!
 
 ## Screenshots
-//TODO: Add screenshots of the application.
+
+<table>
+  <tr>
+    <td>
+      <img src="https://drive.google.com/uc?export=view&id=1QYAdhJl73q77NGSpKN8PyC7pgt87qFL3" width="200" />
+    </td>
+    <td>
+       <p> The main screen of the application. It displays the list of tasks. </p>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://drive.google.com/uc?export=view&id=1DjWZqUGSowAvZsgielyCbjfFuUq3USTv" width="200" />
+    </td>
+    <td>
+         <p> Add a new task. </p>
+    </td>
+  </tr>
+    <tr>
+        <td>
+            <img src="https://drive.google.com/uc?export=view&id=10NG4_Ak77RgfWSn8e-Dsym2xQVqCMZAi" width="200" />
+        </td>
+        <td>
+            <p> You can select a date for the task. </p>
+    </td>
+  </tr>
+  </table>
 
 ## Technologies Used
 - Kotlin ![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=flat&logo=kotlin&logoColor=white)
