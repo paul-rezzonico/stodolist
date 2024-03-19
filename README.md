@@ -5,7 +5,7 @@
 <table>
   <tr>
     <td>
-      <img src="https://drive.google.com/uc?export=view&id=1ENvbMzvEFKa4vGdwvBK3cV5jifuLW62f" />
+      <img src="logo.png" >
     </td>
     <td>
       <p>Stodolist is a simple kotlin-based task management application for Android. It allows users to create, edit, and delete tasks. It also provides reminders and notifications to keep track of deadlines.</p>
