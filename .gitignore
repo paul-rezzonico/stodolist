@@ -1,16 +1,47 @@
-*.iml
+# ===================
+# Gradle
+# ===================
+.gradle/
+build/
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# ===================
+# IDE files
+# ===================
 .idea/
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+*.iml
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+
+# ===================
+# Android
+# ===================
 local.properties
+*.apk
+*.aab
+*.ap_
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ===================
+# Kotlin Multiplatform
+# ===================
+kotlin-js-store/
+
+# ===================
+# iOS / Xcode
+# ===================
+iosApp/Pods/
+iosApp/iosApp.xcworkspace/
+iosApp/iosApp.xcodeproj/project.xcworkspace/
+iosApp/iosApp.xcodeproj/xcuserdata/
+*.xcuserstate
+DerivedData/
+
+# ===================
+# General
+# ===================
+*.log
+*.tmp
+Thumbs.db

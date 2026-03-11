@@ -1,0 +1,25 @@
+CREATE TABLE Task (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    dueDate INTEGER,
+    isCompleted INTEGER NOT NULL DEFAULT 0
+);
+
+getAllTasks:
+SELECT * FROM Task;
+
+getTaskById:
+SELECT * FROM Task WHERE id = ?;
+
+insertTask:
+INSERT INTO Task (title, description, dueDate, isCompleted) VALUES (?, ?, ?, ?);
+
+updateTask:
+UPDATE Task SET title = ?, description = ?, dueDate = ?, isCompleted = ? WHERE id = ?;
+
+deleteTask:
+DELETE FROM Task WHERE id = ?;
+
+deleteAllTasks:
+DELETE FROM Task;

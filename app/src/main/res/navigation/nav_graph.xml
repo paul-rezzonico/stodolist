@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    DEPRECATED: This navigation graph is no longer used.
+    The app now uses Compose UI from the shared module.
+    See MainActivity.kt which uses the shared App composable.
+    This file is kept for reference only.
+-->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

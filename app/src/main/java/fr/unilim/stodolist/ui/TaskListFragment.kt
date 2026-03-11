@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package fr.unilim.stodolist.ui
 
 import android.app.Dialog
@@ -17,13 +19,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import fr.unilim.stodolist.R
-import fr.unilim.stodolist.database.TaskDatabase
 import fr.unilim.stodolist.databinding.FragmentTaskListBinding
-import fr.unilim.stodolist.models.TaskStatus
-import fr.unilim.stodolist.repository.TaskRepository
+import fr.unilim.stodolist.viewmodel.TaskStatus
 import fr.unilim.stodolist.viewmodel.TaskViewModel
 import fr.unilim.stodolist.viewmodel.TaskViewModelFactory
 
+/**
+ * @deprecated This Fragment is deprecated. The app now uses Compose UI from the shared module.
+ * See [MainActivity] which uses the shared [fr.unilim.stodolist.ui.App] composable.
+ * This file is kept for reference only.
+ */
+@Deprecated(
+    message = "Use Compose UI from shared module instead. See MainActivity.",
+    level = DeprecationLevel.WARNING
+)
 class TaskListFragment : Fragment() {
 
     private var _binding: FragmentTaskListBinding? = null
@@ -41,11 +50,9 @@ class TaskListFragment : Fragment() {
     ): View {
         _binding = FragmentTaskListBinding.inflate(inflater, container, false)
 
-        val taskDatabase = TaskDatabase.getInstance(requireContext())
-        val taskDao = taskDatabase.taskDao()
-        val taskRepository = TaskRepository(taskDao)
-        val viewModelFactory = TaskViewModelFactory(taskRepository)
-        taskViewModel = ViewModelProvider(this, viewModelFactory).get(TaskViewModel::class.java)
+        // Use the new factory that creates the shared module dependencies
+        val viewModelFactory = TaskViewModelFactory(requireActivity().application)
+        taskViewModel = ViewModelProvider(this, viewModelFactory)[TaskViewModel::class.java]
 
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
 

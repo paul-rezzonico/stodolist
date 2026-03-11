@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package fr.unilim.stodolist.ui
 
 import android.app.DatePickerDialog
@@ -11,16 +13,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import fr.unilim.stodolist.R
-import fr.unilim.stodolist.database.TaskDatabase
 import fr.unilim.stodolist.databinding.FragmentAddTaskBinding
-import fr.unilim.stodolist.models.Task
-import fr.unilim.stodolist.models.TaskStatus
-import fr.unilim.stodolist.repository.TaskRepository
+import fr.unilim.stodolist.viewmodel.AndroidTask
+import fr.unilim.stodolist.viewmodel.TaskStatus
 import fr.unilim.stodolist.viewmodel.TaskViewModel
 import fr.unilim.stodolist.viewmodel.TaskViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * @deprecated This Fragment is deprecated. The app now uses Compose UI from the shared module.
+ * See [MainActivity] which uses the shared [fr.unilim.stodolist.ui.App] composable.
+ * This file is kept for reference only.
+ */
+@Deprecated(
+    message = "Use Compose UI from shared module instead. See MainActivity.",
+    level = DeprecationLevel.WARNING
+)
 class AddTaskFragment : Fragment() {
 
     private var _binding: FragmentAddTaskBinding? = null
@@ -53,11 +62,9 @@ class AddTaskFragment : Fragment() {
     ): View {
         _binding = FragmentAddTaskBinding.inflate(inflater, container, false)
 
-        val taskDatabase = TaskDatabase.getInstance(requireContext())
-        val taskDao = taskDatabase.taskDao()
-        val taskRepository = TaskRepository(taskDao)
-        val viewModelFactory = TaskViewModelFactory(taskRepository)
-        taskViewModel = ViewModelProvider(this, viewModelFactory).get(TaskViewModel::class.java)
+        // Use the new factory that creates the shared module dependencies
+        val viewModelFactory = TaskViewModelFactory(requireActivity().application)
+        taskViewModel = ViewModelProvider(this, viewModelFactory)[TaskViewModel::class.java]
 
         return binding.root
     }
@@ -87,6 +94,9 @@ class AddTaskFragment : Fragment() {
                 getString(R.string.enter_task_title),
                 Toast.LENGTH_SHORT
             ).show()
+            binding.btnSaveTask.isEnabled = true
+            binding.btnPickDate.isEnabled = true
+            binding.etTaskTitle.isEnabled = true
             return
         }
 
@@ -101,13 +111,12 @@ class AddTaskFragment : Fragment() {
 
         val taskDescription = binding.description.text.toString().trim()
 
-        val task = Task(
+        val task = AndroidTask(
             title = taskTitle,
             status = TaskStatus.TODO,
-            description = taskDescription,
+            description = taskDescription.ifEmpty { null },
             dueDate = dueDate
         )
-
 
         taskViewModel.insertTask(task)
         activity?.runOnUiThread {
