@@ -1,3 +1,4 @@
+-- Task table definition
 CREATE TABLE Task (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -6,20 +7,80 @@ CREATE TABLE Task (
     isCompleted INTEGER NOT NULL DEFAULT 0
 );
 
+-- Get all tasks ordered by completion status and due date
 getAllTasks:
-SELECT * FROM Task;
+SELECT * FROM Task 
+ORDER BY isCompleted ASC, 
+         CASE WHEN dueDate IS NULL THEN 1 ELSE 0 END, 
+         dueDate ASC;
 
+-- Get a single task by ID
 getTaskById:
-SELECT * FROM Task WHERE id = ?;
+SELECT * FROM Task WHERE id = :id;
 
+-- Get pending (incomplete) tasks
+getPendingTasks:
+SELECT * FROM Task WHERE isCompleted = 0
+ORDER BY CASE WHEN dueDate IS NULL THEN 1 ELSE 0 END, dueDate ASC;
+
+-- Get completed tasks
+getCompletedTasks:
+SELECT * FROM Task WHERE isCompleted = 1
+ORDER BY id DESC;
+
+-- Get overdue tasks (due date in the past and not completed)
+getOverdueTasks:
+SELECT * FROM Task 
+WHERE isCompleted = 0 AND dueDate IS NOT NULL AND dueDate < :currentTime;
+
+-- Get tasks due today
+getTasksDueToday:
+SELECT * FROM Task 
+WHERE isCompleted = 0 AND dueDate IS NOT NULL 
+AND dueDate >= :dayStart AND dueDate < :dayEnd;
+
+-- Count all tasks
+countAllTasks:
+SELECT COUNT(*) FROM Task;
+
+-- Count completed tasks
+countCompletedTasks:
+SELECT COUNT(*) FROM Task WHERE isCompleted = 1;
+
+-- Count pending tasks
+countPendingTasks:
+SELECT COUNT(*) FROM Task WHERE isCompleted = 0;
+
+-- Insert a new task and return the inserted ID
 insertTask:
-INSERT INTO Task (title, description, dueDate, isCompleted) VALUES (?, ?, ?, ?);
+INSERT INTO Task (title, description, dueDate, isCompleted) 
+VALUES (:title, :description, :dueDate, :isCompleted);
 
+-- Get last inserted row ID (for platforms that don't support RETURNING)
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+-- Update an existing task
 updateTask:
-UPDATE Task SET title = ?, description = ?, dueDate = ?, isCompleted = ? WHERE id = ?;
+UPDATE Task 
+SET title = :title, 
+    description = :description, 
+    dueDate = :dueDate, 
+    isCompleted = :isCompleted 
+WHERE id = :id;
 
-deleteTask:
-DELETE FROM Task WHERE id = ?;
+-- Toggle task completion status
+toggleTaskCompletion:
+UPDATE Task SET isCompleted = CASE WHEN isCompleted = 0 THEN 1 ELSE 0 END WHERE id = :id;
 
+-- Delete a task by ID
+deleteTaskById:
+DELETE FROM Task WHERE id = :id;
+
+-- Delete all completed tasks
+deleteCompletedTasks:
+DELETE FROM Task WHERE isCompleted = 1;
+
+-- Delete all tasks
 deleteAllTasks:
 DELETE FROM Task;
