@@ -60,7 +60,12 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     // Compose
+    implementation(compose.runtime)
+    implementation(compose.foundation)
+    implementation(compose.material3)
+    implementation(compose.ui)
     implementation(compose.preview)
+    implementation(compose.materialIconsExtended)
     implementation 'androidx.activity:activity-compose:1.8.1'
 
     // Navigation
