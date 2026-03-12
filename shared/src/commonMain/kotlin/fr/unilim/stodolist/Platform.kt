@@ -11,3 +11,9 @@ class Platform(val name: String)
  * This is an expect declaration that must be implemented for each target platform.
  */
 expect fun getPlatform(): Platform
+
+/**
+ * Returns the current time in milliseconds since Unix epoch.
+ * This is an expect declaration that must be implemented for each target platform.
+ */
+expect fun currentTimeMillis(): Long

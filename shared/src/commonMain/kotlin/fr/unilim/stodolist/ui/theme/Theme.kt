@@ -1,7 +1,9 @@
 package fr.unilim.stodolist.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -10,65 +12,147 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Light color scheme
+// =============================================================================
+// Soft Purple/Lavender Color Palette
+// =============================================================================
+
+// Light Theme Colors
+private val LightPrimary = Color(0xFF7C5CBF)           // Soft purple
+private val LightOnPrimary = Color(0xFFFFFFFF)
+private val LightPrimaryContainer = Color(0xFFEDE7F6)  // Very light lavender
+private val LightOnPrimaryContainer = Color(0xFF4A2C8C) // Dark purple for text
+
+private val LightSecondary = Color(0xFFB39DDB)         // Light lavender accent
+private val LightOnSecondary = Color(0xFFFFFFFF)
+private val LightSecondaryContainer = Color(0xFFF3E5F5) // Pale pink-lavender
+private val LightOnSecondaryContainer = Color(0xFF4A2C8C)
+
+private val LightTertiary = Color(0xFF9575CD)          // Medium purple
+private val LightOnTertiary = Color(0xFFFFFFFF)
+private val LightTertiaryContainer = Color(0xFFE8DDFF)
+private val LightOnTertiaryContainer = Color(0xFF21005D)
+
+private val LightError = Color(0xFFBA1A1A)
+private val LightOnError = Color(0xFFFFFFFF)
+private val LightErrorContainer = Color(0xFFFFDAD6)
+private val LightOnErrorContainer = Color(0xFF410002)
+
+private val LightBackground = Color(0xFFFDFBFF)        // Very subtle warm white
+private val LightOnBackground = Color(0xFF1C1B1F)
+private val LightSurface = Color(0xFFFFFFFF)
+private val LightOnSurface = Color(0xFF1C1B1F)
+private val LightSurfaceVariant = Color(0xFFF5F0FA)    // Lavender-tinted
+private val LightOnSurfaceVariant = Color(0xFF49454F)
+private val LightOutline = Color(0xFF79747E)
+private val LightOutlineVariant = Color(0xFFCAC4D0)
+
+// Dark Theme Colors
+private val DarkPrimary = Color(0xFFD0BCFF)            // Light lavender - pops on dark
+private val DarkOnPrimary = Color(0xFF381E72)
+private val DarkPrimaryContainer = Color(0xFF4F378B)   // Deep purple
+private val DarkOnPrimaryContainer = Color(0xFFEADDFF)
+
+private val DarkSecondary = Color(0xFFCCC2DC)          // Muted lavender
+private val DarkOnSecondary = Color(0xFF332D41)
+private val DarkSecondaryContainer = Color(0xFF4A4458) // Dark purple-gray
+private val DarkOnSecondaryContainer = Color(0xFFE8DEF8)
+
+private val DarkTertiary = Color(0xFFEFB8C8)           // Soft pink
+private val DarkOnTertiary = Color(0xFF492532)
+private val DarkTertiaryContainer = Color(0xFF633B48)
+private val DarkOnTertiaryContainer = Color(0xFFFFD8E4)
+
+private val DarkError = Color(0xFFF2B8B5)
+private val DarkOnError = Color(0xFF601410)
+private val DarkErrorContainer = Color(0xFF8C1D18)
+private val DarkOnErrorContainer = Color(0xFFF9DEDC)
+
+private val DarkBackground = Color(0xFF1C1B1F)         // Neutral dark, not greenish
+private val DarkOnBackground = Color(0xFFE6E1E5)
+private val DarkSurface = Color(0xFF1C1B1F)            // Matches background
+private val DarkOnSurface = Color(0xFFE6E1E5)
+private val DarkSurfaceVariant = Color(0xFF49454F)     // Purple-tinted gray
+private val DarkOnSurfaceVariant = Color(0xFFCAC4D0)
+private val DarkOutline = Color(0xFF938F99)
+private val DarkOutlineVariant = Color(0xFF49454F)
+
+// =============================================================================
+// Color Schemes
+// =============================================================================
+
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF6200EE),
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFBB86FC),
-    onPrimaryContainer = Color(0xFF21005E),
-    secondary = Color(0xFF03DAC6),
-    onSecondary = Color.Black,
-    secondaryContainer = Color(0xFFCEFAF8),
-    onSecondaryContainer = Color(0xFF00201E),
-    tertiary = Color(0xFF7D5260),
-    onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFFFD8E4),
-    onTertiaryContainer = Color(0xFF31111D),
-    error = Color(0xFFB3261E),
-    onError = Color.White,
-    errorContainer = Color(0xFFF9DEDC),
-    onErrorContainer = Color(0xFF410E0B),
-    background = Color(0xFFFFFBFE),
-    onBackground = Color(0xFF1C1B1F),
-    surface = Color(0xFFFFFBFE),
-    onSurface = Color(0xFF1C1B1F),
-    surfaceVariant = Color(0xFFE7E0EC),
-    onSurfaceVariant = Color(0xFF49454F),
-    outline = Color(0xFF79747E),
-    outlineVariant = Color(0xFFCAC4D0)
+    primary = LightPrimary,
+    onPrimary = LightOnPrimary,
+    primaryContainer = LightPrimaryContainer,
+    onPrimaryContainer = LightOnPrimaryContainer,
+    secondary = LightSecondary,
+    onSecondary = LightOnSecondary,
+    secondaryContainer = LightSecondaryContainer,
+    onSecondaryContainer = LightOnSecondaryContainer,
+    tertiary = LightTertiary,
+    onTertiary = LightOnTertiary,
+    tertiaryContainer = LightTertiaryContainer,
+    onTertiaryContainer = LightOnTertiaryContainer,
+    error = LightError,
+    onError = LightOnError,
+    errorContainer = LightErrorContainer,
+    onErrorContainer = LightOnErrorContainer,
+    background = LightBackground,
+    onBackground = LightOnBackground,
+    surface = LightSurface,
+    onSurface = LightOnSurface,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = LightOnSurfaceVariant,
+    outline = LightOutline,
+    outlineVariant = LightOutlineVariant
 )
 
-// Dark color scheme
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFFBB86FC),
-    onPrimary = Color(0xFF381E72),
-    primaryContainer = Color(0xFF4F378B),
-    onPrimaryContainer = Color(0xFFEADDFF),
-    secondary = Color(0xFF03DAC6),
-    onSecondary = Color(0xFF003735),
-    secondaryContainer = Color(0xFF004F4D),
-    onSecondaryContainer = Color(0xFF70F7F0),
-    tertiary = Color(0xFFEFB8C8),
-    onTertiary = Color(0xFF492532),
-    tertiaryContainer = Color(0xFF633B48),
-    onTertiaryContainer = Color(0xFFFFD8E4),
-    error = Color(0xFFF2B8B5),
-    onError = Color(0xFF601410),
-    errorContainer = Color(0xFF8C1D18),
-    onErrorContainer = Color(0xFFF9DEDC),
-    background = Color(0xFF1C1B1F),
-    onBackground = Color(0xFFE6E1E5),
-    surface = Color(0xFF1C1B1F),
-    onSurface = Color(0xFFE6E1E5),
-    surfaceVariant = Color(0xFF49454F),
-    onSurfaceVariant = Color(0xFFCAC4D0),
-    outline = Color(0xFF938F99),
-    outlineVariant = Color(0xFF49454F)
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnSecondary,
+    secondaryContainer = DarkSecondaryContainer,
+    onSecondaryContainer = DarkOnSecondaryContainer,
+    tertiary = DarkTertiary,
+    onTertiary = DarkOnTertiary,
+    tertiaryContainer = DarkTertiaryContainer,
+    onTertiaryContainer = DarkOnTertiaryContainer,
+    error = DarkError,
+    onError = DarkOnError,
+    errorContainer = DarkErrorContainer,
+    onErrorContainer = DarkOnErrorContainer,
+    background = DarkBackground,
+    onBackground = DarkOnBackground,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    outline = DarkOutline,
+    outlineVariant = DarkOutlineVariant
 )
 
+// =============================================================================
+// Custom Shapes for Glassmorphism
+// =============================================================================
+
+val AppShapes = Shapes(
+    extraSmall = RoundedCornerShape(8.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(32.dp)
+)
+
+// =============================================================================
 // Typography
+// =============================================================================
+
 private val AppTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = FontFamily.Default,
@@ -178,7 +262,7 @@ private val AppTypography = Typography(
 )
 
 /**
- * AppTheme composable that provides Material3 theming for the app.
+ * AppTheme composable that provides Material3 theming with soft purple/lavender colors.
  *
  * @param darkTheme Whether to use dark theme. Defaults to system setting.
  * @param content The composable content to be themed.
@@ -197,6 +281,7 @@ fun AppTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = AppTypography,
+        shapes = AppShapes,
         content = content
     )
 }

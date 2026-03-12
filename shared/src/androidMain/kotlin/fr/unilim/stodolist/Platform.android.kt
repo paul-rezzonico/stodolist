@@ -9,3 +9,11 @@ import android.os.Build
 actual fun getPlatform(): Platform {
     return Platform("Android ${Build.VERSION.SDK_INT}")
 }
+
+/**
+ * Android implementation of currentTimeMillis().
+ * Returns the current time in milliseconds since Unix epoch.
+ */
+actual fun currentTimeMillis(): Long {
+    return System.currentTimeMillis()
+}

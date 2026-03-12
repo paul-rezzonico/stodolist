@@ -1,11 +1,14 @@
 package fr.unilim.stodolist.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,22 +32,52 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
+import fr.unilim.stodolist.ui.theme.AnimationDuration
+import fr.unilim.stodolist.ui.theme.GlassCard
+import fr.unilim.stodolist.ui.theme.IconSize
+import fr.unilim.stodolist.ui.theme.Spacing
+
+// =============================================================================
+// Warning/Error Colors
+// =============================================================================
 
 /**
- * Warning colors for the permission banner.
+ * Warning colors matching the app's teal/cyan theme.
  * Uses amber/orange tones to convey warning state.
  */
-private val WarningContainerColor = Color(0xFFFFF3E0) // Light orange
-private val WarningContentColor = Color(0xFFE65100) // Dark orange
-private val WarningContainerColorDark = Color(0xFF3E2723) // Dark brown for dark theme
-private val WarningContentColorDark = Color(0xFFFFCC80) // Light orange for dark theme
+private object WarningColors {
+    // Light theme warning colors
+    val containerLight = Color(0xFFFFF3E0) // Light orange
+    val contentLight = Color(0xFFE65100)   // Dark orange
+
+    // Dark theme warning colors
+    val containerDark = Color(0xFF3E2723)  // Dark brown
+    val contentDark = Color(0xFFFFCC80)    // Light orange
+}
+
+/**
+ * Error colors matching the app's theme.
+ */
+private object ErrorColors {
+    // Light theme error colors
+    val containerLight = Color(0xFFFFEBEE) // Light red
+    val contentLight = Color(0xFFC62828)   // Dark red
+
+    // Dark theme error colors
+    val containerDark = Color(0xFF3E2723)  // Dark brown-red
+    val contentDark = Color(0xFFFF8A80)    // Light red (matches theme DarkError)
+}
+
+// =============================================================================
+// Permission Banner Component
+// =============================================================================
 
 /**
  * A banner/card that shows when permission is denied.
- * 
+ *
  * Displays a warning message explaining why the permission is needed,
  * with buttons to grant permission or dismiss the banner.
+ * Uses GlassCard styling with smooth show/hide animations.
  *
  * @param message The message explaining why the permission is needed
  * @param onGrantPermission Callback when "Grant Permission" button is clicked
@@ -56,7 +87,7 @@ private val WarningContentColorDark = Color(0xFFFFCC80) // Light orange for dark
  * @param icon Optional icon to display (defaults to warning icon)
  * @param grantButtonText Text for the grant permission button
  * @param dismissButtonText Text for the dismiss button
- * @param useDarkTheme Whether to use dark theme colors
+ * @param isError Whether to use error styling instead of warning (default false)
  */
 @Composable
 fun PermissionBanner(
@@ -68,29 +99,42 @@ fun PermissionBanner(
     icon: ImageVector = Icons.Default.Warning,
     grantButtonText: String = "Grant Permission",
     dismissButtonText: String = "Maybe Later",
-    useDarkTheme: Boolean = false
+    isError: Boolean = false
 ) {
-    val containerColor = if (useDarkTheme) WarningContainerColorDark else WarningContainerColor
-    val contentColor = if (useDarkTheme) WarningContentColorDark else WarningContentColor
+    val isDarkTheme = isSystemInDarkTheme()
+
+    // Select colors based on error/warning state and theme
+    val contentColor = when {
+        isError && isDarkTheme -> ErrorColors.contentDark
+        isError -> ErrorColors.contentLight
+        isDarkTheme -> WarningColors.contentDark
+        else -> WarningColors.contentLight
+    }
 
     AnimatedVisibility(
         visible = visible,
-        enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
-        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+        enter = expandVertically(
+            expandFrom = Alignment.Top,
+            animationSpec = tween(AnimationDuration.medium)
+        ) + fadeIn(
+            animationSpec = tween(AnimationDuration.medium)
+        ),
+        exit = shrinkVertically(
+            shrinkTowards = Alignment.Top,
+            animationSpec = tween(AnimationDuration.medium)
+        ) + fadeOut(
+            animationSpec = tween(AnimationDuration.medium)
+        )
     ) {
-        Card(
+        GlassCard(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = containerColor
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                .padding(horizontal = Spacing.md, vertical = Spacing.xs)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(Spacing.md)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -98,12 +142,12 @@ fun PermissionBanner(
                 ) {
                     Icon(
                         imageVector = icon,
-                        contentDescription = "Warning",
-                        modifier = Modifier.size(24.dp),
+                        contentDescription = if (isError) "Error" else "Warning",
+                        modifier = Modifier.size(IconSize.medium),
                         tint = contentColor
                     )
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(Spacing.sm))
 
                     Text(
                         text = message,
@@ -114,7 +158,7 @@ fun PermissionBanner(
 
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(IconSize.medium)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -124,7 +168,7 @@ fun PermissionBanner(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -143,7 +187,7 @@ fun PermissionBanner(
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Spacing.xs))
 
                     Button(
                         onClick = onGrantPermission,
@@ -163,6 +207,10 @@ fun PermissionBanner(
     }
 }
 
+// =============================================================================
+// Convenience Composables for Common Permission Banners
+// =============================================================================
+
 /**
  * A simplified notification permission banner with predefined text.
  *
@@ -170,15 +218,13 @@ fun PermissionBanner(
  * @param onDismiss Callback when the banner is dismissed
  * @param visible Whether the banner is visible
  * @param modifier Optional modifier
- * @param useDarkTheme Whether to use dark theme colors
  */
 @Composable
 fun NotificationPermissionBanner(
     onGrantPermission: () -> Unit,
     onDismiss: () -> Unit,
     visible: Boolean = true,
-    modifier: Modifier = Modifier,
-    useDarkTheme: Boolean = false
+    modifier: Modifier = Modifier
 ) {
     PermissionBanner(
         message = "Notifications are disabled. Enable them to receive task reminders and never miss a deadline.",
@@ -187,8 +233,7 @@ fun NotificationPermissionBanner(
         modifier = modifier,
         visible = visible,
         grantButtonText = "Enable Notifications",
-        dismissButtonText = "Maybe Later",
-        useDarkTheme = useDarkTheme
+        dismissButtonText = "Maybe Later"
     )
 }
 
@@ -199,15 +244,13 @@ fun NotificationPermissionBanner(
  * @param onDismiss Callback when the banner is dismissed
  * @param visible Whether the banner is visible
  * @param modifier Optional modifier
- * @param useDarkTheme Whether to use dark theme colors
  */
 @Composable
 fun AlarmPermissionBanner(
     onGrantPermission: () -> Unit,
     onDismiss: () -> Unit,
     visible: Boolean = true,
-    modifier: Modifier = Modifier,
-    useDarkTheme: Boolean = false
+    modifier: Modifier = Modifier
 ) {
     PermissionBanner(
         message = "Exact alarm permission is required for precise task reminders. Without it, reminders may be delayed.",
@@ -216,7 +259,6 @@ fun AlarmPermissionBanner(
         modifier = modifier,
         visible = visible,
         grantButtonText = "Enable Alarms",
-        dismissButtonText = "Maybe Later",
-        useDarkTheme = useDarkTheme
+        dismissButtonText = "Maybe Later"
     )
 }

@@ -379,8 +379,7 @@ fun PermissionScreen(
                 onDismiss = {
                     permissionUiState = permissionUiState.dismissBanner()
                 },
-                modifier = Modifier.fillMaxWidth(),
-                useDarkTheme = darkTheme
+                modifier = Modifier.fillMaxWidth()
             )
 
             App(
