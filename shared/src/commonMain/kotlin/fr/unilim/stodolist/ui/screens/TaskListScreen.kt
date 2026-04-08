@@ -8,8 +8,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
@@ -66,7 +68,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import fr.unilim.stodolist.models.Category
 import fr.unilim.stodolist.models.Task
+import fr.unilim.stodolist.ui.components.CategoryFilterBar
 import fr.unilim.stodolist.ui.components.TaskItem
 import fr.unilim.stodolist.ui.components.getDueDateStatus
 import fr.unilim.stodolist.ui.components.DueDateStatus
@@ -87,6 +91,7 @@ import kotlin.math.roundToInt
  * Features:
  * - MediumTopAppBar with gradient background
  * - Task statistics header with animated progress
+ * - Category filter bar
  * - Beautiful empty state with custom illustration
  * - Collapsible ExtendedFloatingActionButton
  * - Subtle gradient background
@@ -103,9 +108,16 @@ fun TaskListScreen(
     modifier: Modifier = Modifier
 ) {
     val tasks by viewModel.tasks.collectAsState()
+    val categories by viewModel.categories.collectAsState()
+    val selectedFilterCategory by viewModel.selectedFilterCategory.collectAsState()
     
     TaskListScreenContent(
         tasks = tasks,
+        categories = categories,
+        selectedFilterCategoryId = selectedFilterCategory,
+        onFilterCategorySelect = { categoryId ->
+            viewModel.setFilterCategory(categoryId)
+        },
         onAddTaskClick = onAddTaskClick,
         onTaskCheckedChange = { task, _ -> 
             viewModel.toggleTaskCompletion(task)
@@ -125,6 +137,9 @@ fun TaskListScreen(
  * Overload that accepts a StateFlow directly for more flexibility.
  *
  * @param tasksFlow The StateFlow of tasks to observe
+ * @param categoriesFlow The StateFlow of categories to observe
+ * @param selectedFilterCategoryFlow The StateFlow of the selected filter category ID
+ * @param onFilterCategorySelect Callback when a category filter is selected
  * @param onAddTaskClick Callback when the FAB is clicked to add a new task
  * @param onTaskCheckedChange Callback when a task's completion status is toggled
  * @param onTaskDeleteClick Callback when a task is deleted
@@ -133,15 +148,23 @@ fun TaskListScreen(
 @Composable
 fun TaskListScreen(
     tasksFlow: StateFlow<List<Task>>,
+    categoriesFlow: StateFlow<List<Category>> = kotlinx.coroutines.flow.MutableStateFlow(emptyList()),
+    selectedFilterCategoryFlow: StateFlow<Long?> = kotlinx.coroutines.flow.MutableStateFlow(null),
+    onFilterCategorySelect: (Long?) -> Unit = {},
     onAddTaskClick: () -> Unit,
     onTaskCheckedChange: (Task, Boolean) -> Unit,
     onTaskDeleteClick: (Task) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val tasks by tasksFlow.collectAsState()
+    val categories by categoriesFlow.collectAsState()
+    val selectedFilterCategory by selectedFilterCategoryFlow.collectAsState()
     
     TaskListScreenContent(
         tasks = tasks,
+        categories = categories,
+        selectedFilterCategoryId = selectedFilterCategory,
+        onFilterCategorySelect = onFilterCategorySelect,
         onAddTaskClick = onAddTaskClick,
         onTaskCheckedChange = onTaskCheckedChange,
         onTaskDeleteClick = onTaskDeleteClick,
@@ -157,6 +180,9 @@ fun TaskListScreen(
 @Composable
 private fun TaskListScreenContent(
     tasks: List<Task>,
+    categories: List<Category> = emptyList(),
+    selectedFilterCategoryId: Long? = null,
+    onFilterCategorySelect: (Long?) -> Unit = {},
     onAddTaskClick: () -> Unit,
     onTaskCheckedChange: (Task, Boolean) -> Unit,
     onTaskDeleteClick: (Task) -> Unit,
@@ -172,12 +198,23 @@ private fun TaskListScreenContent(
         }
     }
     
-    // Calculate task statistics
-    val taskStats = remember(tasks) {
+    // Filter tasks by selected category
+    val filteredTasks = remember(tasks, selectedFilterCategoryId) {
+        if (selectedFilterCategoryId == null) {
+            tasks
+        } else {
+            tasks.filter { task ->
+                task.categories.any { it.id == selectedFilterCategoryId }
+            }
+        }
+    }
+    
+    // Calculate task statistics (based on filtered tasks for accurate display)
+    val taskStats = remember(filteredTasks) {
         TaskStatistics(
-            total = tasks.size,
-            completed = tasks.count { it.isCompleted },
-            overdue = tasks.count { !it.isCompleted && getDueDateStatus(it.dueDate) == DueDateStatus.Overdue }
+            total = filteredTasks.size,
+            completed = filteredTasks.count { it.isCompleted },
+            overdue = filteredTasks.count { !it.isCompleted && getDueDateStatus(it.dueDate) == DueDateStatus.Overdue }
         )
     }
     
@@ -235,58 +272,121 @@ private fun TaskListScreenContent(
                         TaskStatisticsHeader(stats = taskStats)
                     }
                     
-                    // Active tasks section
-                    val activeTasks = tasks.filter { !it.isCompleted }
-                    if (activeTasks.isNotEmpty()) {
-                        item(key = "active_header") {
-                            SectionHeader(
-                                title = "Active",
-                                count = activeTasks.size
-                            )
-                        }
-                        
-                        items(
-                            items = activeTasks,
-                            key = { task -> "active_${task.id}" }
-                        ) { task ->
-                            TaskItem(
-                                task = task,
-                                onCheckedChange = { isChecked ->
-                                    onTaskCheckedChange(task, isChecked)
-                                },
-                                onDeleteClick = {
-                                    onTaskDeleteClick(task)
-                                }
-                            )
+                    // Category filter bar
+                    if (categories.isNotEmpty()) {
+                        item(key = "category_filter") {
+                            AnimatedVisibility(
+                                visible = true,
+                                enter = fadeIn() + expandVertically(),
+                                exit = fadeOut() + shrinkVertically()
+                            ) {
+                                CategoryFilterBar(
+                                    categories = categories,
+                                    selectedCategoryId = selectedFilterCategoryId,
+                                    onCategorySelect = onFilterCategorySelect,
+                                    modifier = Modifier.padding(vertical = Spacing.xs)
+                                )
+                            }
                         }
                     }
                     
-                    // Completed tasks section
-                    val completedTasks = tasks.filter { it.isCompleted }
-                    if (completedTasks.isNotEmpty()) {
-                        item(key = "completed_header") {
-                            SectionHeader(
-                                title = "Completed",
-                                count = completedTasks.size
+                    // Check if filtered results are empty
+                    if (filteredTasks.isEmpty() && selectedFilterCategoryId != null) {
+                        item(key = "no_results") {
+                            NoFilterResultsState(
+                                onClearFilter = { onFilterCategorySelect(null) }
                             )
                         }
+                    } else {
+                        // Active tasks section
+                        val activeTasks = filteredTasks.filter { !it.isCompleted }
+                        if (activeTasks.isNotEmpty()) {
+                            item(key = "active_header") {
+                                SectionHeader(
+                                    title = "Active",
+                                    count = activeTasks.size
+                                )
+                            }
+                            
+                            items(
+                                items = activeTasks,
+                                key = { task -> "active_${task.id}" }
+                            ) { task ->
+                                TaskItem(
+                                    task = task,
+                                    onCheckedChange = { isChecked ->
+                                        onTaskCheckedChange(task, isChecked)
+                                    },
+                                    onDeleteClick = {
+                                        onTaskDeleteClick(task)
+                                    }
+                                )
+                            }
+                        }
                         
-                        items(
-                            items = completedTasks,
-                            key = { task -> "completed_${task.id}" }
-                        ) { task ->
-                            TaskItem(
-                                task = task,
-                                onCheckedChange = { isChecked ->
-                                    onTaskCheckedChange(task, isChecked)
-                                },
-                                onDeleteClick = {
-                                    onTaskDeleteClick(task)
-                                }
-                            )
+                        // Completed tasks section
+                        val completedTasks = filteredTasks.filter { it.isCompleted }
+                        if (completedTasks.isNotEmpty()) {
+                            item(key = "completed_header") {
+                                SectionHeader(
+                                    title = "Completed",
+                                    count = completedTasks.size
+                                )
+                            }
+                            
+                            items(
+                                items = completedTasks,
+                                key = { task -> "completed_${task.id}" }
+                            ) { task ->
+                                TaskItem(
+                                    task = task,
+                                    onCheckedChange = { isChecked ->
+                                        onTaskCheckedChange(task, isChecked)
+                                    },
+                                    onDeleteClick = {
+                                        onTaskDeleteClick(task)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+// =============================================================================
+// No Filter Results State
+// =============================================================================
+
+/**
+ * Displayed when a category filter yields no results.
+ */
+@Composable
+private fun NoFilterResultsState(
+    onClearFilter: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    GlassCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.md, vertical = Spacing.lg)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Spacing.lg),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+        ) {
+            Text(
+                text = "No tasks in this category",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            androidx.compose.material3.TextButton(onClick = onClearFilter) {
+                Text("Show all tasks")
             }
         }
     }

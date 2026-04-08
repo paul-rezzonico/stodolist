@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
  * @property description Optional detailed description of the task
  * @property dueDate Optional due date as Unix timestamp (milliseconds)
  * @property isCompleted Whether the task has been completed
+ * @property categories List of categories this task belongs to
  */
 @Serializable
 data class Task(
@@ -17,5 +18,6 @@ data class Task(
     val title: String,
     val description: String? = null,
     val dueDate: Long? = null,
-    val isCompleted: Boolean = false
+    val isCompleted: Boolean = false,
+    val categories: List<Category> = emptyList()
 )

@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -38,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import fr.unilim.stodolist.models.Category
 import fr.unilim.stodolist.models.Task
 import fr.unilim.stodolist.ui.theme.GlassCard
 import fr.unilim.stodolist.ui.theme.IconSize
@@ -305,6 +308,7 @@ private fun StatusIndicatorStrip(
  * - Custom circular checkbox with animations
  * - Proper typography and spacing
  * - Completion state animations
+ * - Category chips display
  *
  * @param task The task to display.
  * @param onCheckedChange Callback when the completion checkbox is toggled.
@@ -355,6 +359,18 @@ fun TaskItem(
         label = "secondary_text_color"
     )
     
+    // Calculate dynamic height based on content
+    val hasDescription = !task.description.isNullOrBlank()
+    val hasCategories = task.categories.isNotEmpty()
+    val hasDueDate = task.dueDate != null && !task.isCompleted
+    
+    val cardHeight = when {
+        hasDescription && hasCategories -> 100.dp
+        hasDescription || hasCategories -> 88.dp
+        hasDueDate -> 72.dp
+        else -> 64.dp
+    }
+    
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
@@ -365,7 +381,7 @@ fun TaskItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(if (task.description.isNullOrBlank()) 64.dp else 80.dp)
+                .height(cardHeight)
                 .padding(end = Spacing.xs),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -385,7 +401,7 @@ fun TaskItem(
             
             Spacer(modifier = Modifier.width(Spacing.sm))
             
-            // Content column: title, description, due date
+            // Content column: title, description, due date, categories
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -411,7 +427,7 @@ fun TaskItem(
                             style = MaterialTheme.typography.bodySmall,
                             color = secondaryTextColor,
                             textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None,
-                            maxLines = 2,
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
@@ -440,6 +456,14 @@ fun TaskItem(
                         }
                     }
                 }
+                
+                // Categories row (compact chips)
+                if (task.categories.isNotEmpty()) {
+                    TaskCategoriesRow(
+                        categories = task.categories,
+                        isCompleted = task.isCompleted
+                    )
+                }
             }
             
             // Delete action button
@@ -455,5 +479,71 @@ fun TaskItem(
                 )
             }
         }
+    }
+}
+
+// =============================================================================
+// Task Categories Row
+// =============================================================================
+
+/**
+ * A compact row displaying task categories as small emoji chips.
+ * Shows up to 3 categories inline, with horizontal scroll if more.
+ *
+ * @param categories The list of categories to display.
+ * @param isCompleted Whether the parent task is completed (affects opacity).
+ * @param modifier Optional modifier for the component.
+ */
+@Composable
+private fun TaskCategoriesRow(
+    categories: List<Category>,
+    isCompleted: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val scrollState = rememberScrollState()
+    val contentAlpha = if (isCompleted) 0.6f else 1f
+    
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(scrollState)
+            .alpha(contentAlpha),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xxs),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        categories.forEach { category ->
+            TaskCategoryDot(category = category)
+        }
+    }
+}
+
+/**
+ * A compact category indicator showing emoji with colored background.
+ */
+@Composable
+private fun TaskCategoryDot(
+    category: Category,
+    modifier: Modifier = Modifier
+) {
+    val categoryColor = category.colorHex.toColor()
+    
+    Row(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.extraSmall)
+            .background(categoryColor.copy(alpha = 0.15f))
+            .padding(horizontal = Spacing.xxs, vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = category.icon,
+            style = MaterialTheme.typography.labelSmall
+        )
+        Text(
+            text = category.name,
+            style = MaterialTheme.typography.labelSmall,
+            color = categoryColor,
+            maxLines = 1
+        )
     }
 }

@@ -1,0 +1,81 @@
+-- Category table definition
+CREATE TABLE Category (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    colorHex TEXT NOT NULL,
+    icon TEXT NOT NULL,
+    isDefault INTEGER NOT NULL DEFAULT 0
+);
+
+-- Junction table for many-to-many relationship
+CREATE TABLE TaskCategory (
+    taskId INTEGER NOT NULL,
+    categoryId INTEGER NOT NULL,
+    PRIMARY KEY (taskId, categoryId),
+    FOREIGN KEY (taskId) REFERENCES Task(id) ON DELETE CASCADE,
+    FOREIGN KEY (categoryId) REFERENCES Category(id) ON DELETE CASCADE
+);
+
+-- Get all categories
+getAllCategories:
+SELECT * FROM Category ORDER BY isDefault DESC, name ASC;
+
+-- Get category by ID
+getCategoryById:
+SELECT * FROM Category WHERE id = :id;
+
+-- Get categories for a specific task
+getCategoriesForTask:
+SELECT c.* FROM Category c
+INNER JOIN TaskCategory tc ON c.id = tc.categoryId
+WHERE tc.taskId = :taskId;
+
+-- Get tasks for a specific category
+getTaskIdsForCategory:
+SELECT taskId FROM TaskCategory WHERE categoryId = :categoryId;
+
+-- Count tasks per category
+countTasksPerCategory:
+SELECT c.id, c.name, COUNT(tc.taskId) AS taskCount
+FROM Category c
+LEFT JOIN TaskCategory tc ON c.id = tc.categoryId
+GROUP BY c.id;
+
+-- Insert a new category
+insertCategory:
+INSERT INTO Category (name, colorHex, icon, isDefault) 
+VALUES (:name, :colorHex, :icon, :isDefault);
+
+-- Get last inserted category ID
+lastInsertCategoryId:
+SELECT last_insert_rowid();
+
+-- Update a category
+updateCategory:
+UPDATE Category 
+SET name = :name, colorHex = :colorHex, icon = :icon 
+WHERE id = :id;
+
+-- Delete a category (only non-default)
+deleteCategoryById:
+DELETE FROM Category WHERE id = :id AND isDefault = 0;
+
+-- Add category to task
+addCategoryToTask:
+INSERT OR IGNORE INTO TaskCategory (taskId, categoryId) VALUES (:taskId, :categoryId);
+
+-- Remove category from task
+removeCategoryFromTask:
+DELETE FROM TaskCategory WHERE taskId = :taskId AND categoryId = :categoryId;
+
+-- Remove all categories from task
+clearCategoriesFromTask:
+DELETE FROM TaskCategory WHERE taskId = :taskId;
+
+-- Set categories for task (will be used with clearCategoriesFromTask for replace)
+setCategoriesForTask:
+INSERT OR IGNORE INTO TaskCategory (taskId, categoryId) VALUES (:taskId, :categoryId);
+
+-- Check if default categories exist
+countDefaultCategories:
+SELECT COUNT(*) FROM Category WHERE isDefault = 1;

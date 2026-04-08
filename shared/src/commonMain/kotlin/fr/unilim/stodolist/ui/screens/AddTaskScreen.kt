@@ -16,6 +16,8 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,12 +32,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -75,6 +79,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.unilim.stodolist.currentTimeMillis
+import fr.unilim.stodolist.models.Category
+import fr.unilim.stodolist.ui.components.CategoryChip
+import fr.unilim.stodolist.ui.components.CategorySelector
+import fr.unilim.stodolist.ui.components.toColor
 import fr.unilim.stodolist.ui.theme.CornerRadius
 import fr.unilim.stodolist.ui.theme.GlassCard
 import fr.unilim.stodolist.ui.theme.Spacing
@@ -86,6 +94,30 @@ import fr.unilim.stodolist.ui.theme.glassBackgroundColor
 
 private const val MAX_TITLE_LENGTH = 100
 private const val MAX_DESCRIPTION_LENGTH = 500
+private const val MAX_CATEGORY_NAME_LENGTH = 30
+
+// Predefined colors for new category creation
+private val CATEGORY_COLORS = listOf(
+    "#5C6BC0", // Indigo
+    "#26A69A", // Teal
+    "#EF5350", // Red
+    "#66BB6A", // Green
+    "#FFA726", // Orange
+    "#42A5F5", // Blue
+    "#EC407A", // Pink
+    "#78909C", // Blue Grey
+    "#AB47BC", // Purple
+    "#8D6E63", // Brown
+    "#29B6F6", // Light Blue
+    "#9CCC65"  // Light Green
+)
+
+// Predefined emojis for new category creation
+private val CATEGORY_EMOJIS = listOf(
+    "📌", "💼", "🏠", "🛒", "💪", "💰", "📚", "👥",
+    "🎯", "🎨", "🎮", "✈️", "🍔", "🎵", "⚽", "🔧",
+    "💡", "📧", "🎁", "❤️", "⭐", "🔥", "🌟", "🚀"
+)
 
 // =============================================================================
 // AddTaskScreen - Main Composable
@@ -98,25 +130,31 @@ private const val MAX_DESCRIPTION_LENGTH = 500
  * - Glass-like app bar with gradient background
  * - Modern form layout with GlassCard containers
  * - Material3 DatePicker dialog for due date selection
+ * - Category selection with ability to create new categories
  * - Character counters and validation
  * - Loading state and success animation
  * - Proper spacing and visual hierarchy
  *
- * @param onSave Callback when the save button is clicked with title, description, and optional due date
+ * @param onSave Callback when the save button is clicked with title, description, optional due date, and category IDs
  * @param onCancel Callback when the cancel button or back arrow is clicked
+ * @param categories List of available categories
+ * @param onAddCategory Callback to add a new category (name, colorHex, icon)
  * @param modifier Optional modifier for the screen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskScreen(
-    onSave: (title: String, description: String?, dueDate: Long?) -> Unit,
+    onSave: (title: String, description: String?, dueDate: Long?, categoryIds: List<Long>) -> Unit,
     onCancel: () -> Unit,
+    categories: List<Category> = emptyList(),
+    onAddCategory: ((name: String, colorHex: String, icon: String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // Form state
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var selectedDateMillis by remember { mutableStateOf<Long?>(null) }
+    var selectedCategoryIds by remember { mutableStateOf<Set<Long>>(emptySet()) }
     
     // Validation state
     var titleError by remember { mutableStateOf<String?>(null) }
@@ -125,6 +163,7 @@ fun AddTaskScreen(
     
     // UI state
     var showDatePicker by remember { mutableStateOf(false) }
+    var showAddCategoryDialog by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var showSuccess by remember { mutableStateOf(false) }
     
@@ -177,7 +216,7 @@ fun AddTaskScreen(
                     if (isFormValid && !isLoading) {
                         isLoading = true
                         val descriptionValue = description.ifBlank { null }
-                        onSave(title.trim(), descriptionValue, selectedDateMillis)
+                        onSave(title.trim(), descriptionValue, selectedDateMillis, selectedCategoryIds.toList())
                     } else {
                         hasAttemptedSubmit = true
                         if (title.isBlank()) {
@@ -240,6 +279,22 @@ fun AddTaskScreen(
                     onClearDate = { selectedDateMillis = null }
                 )
                 
+                // Category Selection Section
+                CategorySelectionSection(
+                    categories = categories,
+                    selectedCategoryIds = selectedCategoryIds,
+                    onCategoryToggle = { categoryId ->
+                        selectedCategoryIds = if (selectedCategoryIds.contains(categoryId)) {
+                            selectedCategoryIds - categoryId
+                        } else {
+                            selectedCategoryIds + categoryId
+                        }
+                    },
+                    onAddNew = if (onAddCategory != null) {
+                        { showAddCategoryDialog = true }
+                    } else null
+                )
+                
                 Spacer(modifier = Modifier.height(Spacing.lg))
                 
                 // Action Buttons Section
@@ -251,7 +306,7 @@ fun AddTaskScreen(
                             hasAttemptedSubmit = true
                             isLoading = true
                             val descriptionValue = description.ifBlank { null }
-                            onSave(title.trim(), descriptionValue, selectedDateMillis)
+                            onSave(title.trim(), descriptionValue, selectedDateMillis, selectedCategoryIds.toList())
                         } else {
                             hasAttemptedSubmit = true
                             if (title.isBlank()) {
@@ -286,6 +341,17 @@ fun AddTaskScreen(
             onConfirm = { dateMillis ->
                 selectedDateMillis = dateMillis
                 showDatePicker = false
+            }
+        )
+    }
+    
+    // Add Category Dialog
+    if (showAddCategoryDialog && onAddCategory != null) {
+        AddCategoryDialog(
+            onDismiss = { showAddCategoryDialog = false },
+            onConfirm = { name, colorHex, icon ->
+                onAddCategory(name, colorHex, icon)
+                showAddCategoryDialog = false
             }
         )
     }
@@ -991,4 +1057,358 @@ private fun formatDateFull(timestamp: Long): String {
 
 private fun isLeapYear(year: Int): Boolean {
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+}
+
+// =============================================================================
+// Category Selection Section
+// =============================================================================
+
+/**
+ * Section for selecting categories with the ability to add new ones.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CategorySelectionSection(
+    categories: List<Category>,
+    selectedCategoryIds: Set<Long>,
+    onCategoryToggle: (Long) -> Unit,
+    onAddNew: (() -> Unit)?,
+    modifier: Modifier = Modifier
+) {
+    GlassCard(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Spacing.md)
+        ) {
+            // Section header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
+            ) {
+                Text(
+                    text = "📂",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    text = "Categories",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "(Optional)",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(Spacing.sm))
+            
+            // Selected categories display
+            if (selectedCategoryIds.isNotEmpty()) {
+                val selectedCategories = categories.filter { selectedCategoryIds.contains(it.id) }
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = Spacing.sm),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xs)
+                ) {
+                    selectedCategories.forEach { category ->
+                        CategoryChip(
+                            category = category,
+                            isSelected = true,
+                            onDelete = { onCategoryToggle(category.id) }
+                        )
+                    }
+                }
+            }
+            
+            // Category selector
+            if (categories.isNotEmpty()) {
+                CategorySelector(
+                    categories = categories,
+                    selectedCategoryIds = selectedCategoryIds,
+                    onCategoryToggle = onCategoryToggle,
+                    onAddNew = onAddNew,
+                    expanded = true
+                )
+            } else if (onAddNew != null) {
+                // Empty state with add button
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(CornerRadius.small))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                        .clickable { onAddNew() }
+                        .padding(Spacing.md),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(Spacing.xs))
+                    Text(
+                        text = "Create your first category",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+    }
+}
+
+// =============================================================================
+// Add Category Dialog
+// =============================================================================
+
+/**
+ * Dialog for creating a new category with name, color, and emoji selection.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun AddCategoryDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (name: String, colorHex: String, icon: String) -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var selectedColor by remember { mutableStateOf(CATEGORY_COLORS.first()) }
+    var selectedEmoji by remember { mutableStateOf(CATEGORY_EMOJIS.first()) }
+    var nameError by remember { mutableStateOf<String?>(null) }
+    
+    val isValid = name.isNotBlank() && name.length <= MAX_CATEGORY_NAME_LENGTH
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "New Category",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(Spacing.md)
+            ) {
+                // Name input
+                Column {
+                    Text(
+                        text = "Name",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.xxs))
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { newName ->
+                            if (newName.length <= MAX_CATEGORY_NAME_LENGTH) {
+                                name = newName
+                                nameError = if (newName.isBlank()) "Name is required" else null
+                            }
+                        },
+                        placeholder = { Text("Category name") },
+                        isError = nameError != null,
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(CornerRadius.small)
+                    )
+                    if (nameError != null) {
+                        Text(
+                            text = nameError ?: "",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(top = Spacing.xxs)
+                        )
+                    }
+                }
+
+                Column {
+                    Text(
+                        text = "Color",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.xxs))
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.xs)
+                    ) {
+                        CATEGORY_COLORS.forEach { colorHex ->
+                            ColorPickerItem(
+                                colorHex = colorHex,
+                                isSelected = selectedColor == colorHex,
+                                onClick = { selectedColor = colorHex }
+                            )
+                        }
+                    }
+                }
+                
+                // Emoji picker
+                Column {
+                    Text(
+                        text = "Icon",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.xxs))
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.xs)
+                    ) {
+                        CATEGORY_EMOJIS.forEach { emoji ->
+                            EmojiPickerItem(
+                                emoji = emoji,
+                                isSelected = selectedEmoji == emoji,
+                                selectedColor = selectedColor,
+                                onClick = { selectedEmoji = emoji }
+                            )
+                        }
+                    }
+                }
+                
+                // Preview
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .background(selectedColor.toColor().copy(alpha = 0.2f))
+                            .border(
+                                width = 1.dp,
+                                color = selectedColor.toColor().copy(alpha = 0.5f),
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .padding(horizontal = Spacing.sm, vertical = Spacing.xs)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.xxs)
+                        ) {
+                            Text(text = selectedEmoji)
+                            Text(
+                                text = name.ifBlank { "Preview" },
+                                style = MaterialTheme.typography.labelLarge,
+                                color = selectedColor.toColor()
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onConfirm(name.trim(), selectedColor, selectedEmoji) },
+                enabled = isValid
+            ) {
+                Text("Create")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+/**
+ * A color picker item for category creation.
+ */
+@Composable
+private fun ColorPickerItem(
+    colorHex: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val color = colorHex.toColor()
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.1f else 1f,
+        animationSpec = tween(150),
+        label = "color_picker_scale"
+    )
+    
+    Box(
+        modifier = modifier
+            .size(32.dp)
+            .scale(scale)
+            .clip(CircleShape)
+            .background(color)
+            .border(
+                width = if (isSelected) 3.dp else 1.dp,
+                color = if (isSelected) MaterialTheme.colorScheme.onSurface else color.copy(alpha = 0.5f),
+                shape = CircleShape
+            )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (isSelected) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Selected",
+                modifier = Modifier.size(16.dp),
+                tint = Color.White
+            )
+        }
+    }
+}
+
+/**
+ * An emoji picker item for category creation.
+ */
+@Composable
+private fun EmojiPickerItem(
+    emoji: String,
+    isSelected: Boolean,
+    selectedColor: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.15f else 1f,
+        animationSpec = tween(150),
+        label = "emoji_picker_scale"
+    )
+    
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isSelected) {
+            selectedColor.toColor().copy(alpha = 0.2f)
+        } else {
+            Color.Transparent
+        },
+        animationSpec = tween(150),
+        label = "emoji_picker_bg"
+    )
+    
+    Box(
+        modifier = modifier
+            .size(36.dp)
+            .scale(scale)
+            .clip(CircleShape)
+            .background(backgroundColor)
+            .border(
+                width = if (isSelected) 2.dp else 0.dp,
+                color = if (isSelected) selectedColor.toColor().copy(alpha = 0.6f) else Color.Transparent,
+                shape = CircleShape
+            )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = emoji,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }

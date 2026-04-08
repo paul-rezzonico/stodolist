@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,15 +81,21 @@ fun App(
                     }
 
                     is Screen.AddTask -> {
+                        val categories by viewModel.categories.collectAsState()
+                        
                         AddTaskScreen(
-                            onSave = { title, description, dueDate ->
-                                viewModel.addTask(title, description, dueDate)
+                            onSave = { title, description, dueDate, categoryIds ->
+                                viewModel.addTask(title, description, dueDate, categoryIds)
                                 isNavigatingForward = false
                                 currentScreen = Screen.TaskList
                             },
                             onCancel = {
                                 isNavigatingForward = false
                                 currentScreen = Screen.TaskList
+                            },
+                            categories = categories,
+                            onAddCategory = { name, colorHex, icon ->
+                                viewModel.addCategory(name, colorHex, icon)
                             }
                         )
                     }
@@ -151,15 +158,21 @@ fun App(
                     }
 
                     is Screen.AddTask -> {
+                        val categories by viewModel.categories.collectAsState()
+                        
                         AddTaskScreen(
-                            onSave = { title, description, dueDate ->
-                                viewModel.addTask(title, description, dueDate)
+                            onSave = { title, description, dueDate, categoryIds ->
+                                viewModel.addTask(title, description, dueDate, categoryIds)
                                 isNavigatingForward = false
                                 currentScreen = Screen.TaskList
                             },
                             onCancel = {
                                 isNavigatingForward = false
                                 currentScreen = Screen.TaskList
+                            },
+                            categories = categories,
+                            onAddCategory = { name, colorHex, icon ->
+                                viewModel.addCategory(name, colorHex, icon)
                             }
                         )
                     }
