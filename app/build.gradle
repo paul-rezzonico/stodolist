@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace 'fr.unilim.stodolist'
-    compileSdk 35
+    compileSdk = 36
 
     viewBinding {
         enabled = true
@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId "fr.unilim.stodolist"
-        minSdk 24
+        minSdk = 24
         targetSdk 35
         versionCode 1
         versionName "1.0"
