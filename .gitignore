@@ -28,6 +28,7 @@ captures/
 # Kotlin Multiplatform
 # ===================
 kotlin-js-store/
+.kotlin
 
 # ===================
 # iOS / Xcode

@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    kotlin("plugin.compose")
     id("com.android.library")
     id("app.cash.sqldelight")
     id("org.jetbrains.compose")
@@ -23,19 +24,19 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 // Coroutines
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
                 // Serialization
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
                 // SQLDelight
-                implementation("app.cash.sqldelight:runtime:2.0.1")
-                implementation("app.cash.sqldelight:coroutines-extensions:2.0.1")
+                implementation("app.cash.sqldelight:runtime:2.0.2")
+                implementation("app.cash.sqldelight:coroutines-extensions:2.0.2")
 
                 // Ktor Client
-                implementation("io.ktor:ktor-client-core:2.3.7")
-                implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+                implementation("io.ktor:ktor-client-core:3.0.1")
+                implementation("io.ktor:ktor-client-content-negotiation:3.0.1")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.1")
 
                 // Compose Multiplatform
                 implementation(compose.runtime)
@@ -56,10 +57,10 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 // SQLDelight Android Driver
-                implementation("app.cash.sqldelight:android-driver:2.0.1")
+                implementation("app.cash.sqldelight:android-driver:2.0.2")
 
                 // Ktor Android Client
-                implementation("io.ktor:ktor-client-android:2.3.7")
+                implementation("io.ktor:ktor-client-okhttp:3.0.1")
             }
         }
 
@@ -74,10 +75,10 @@ kotlin {
 
             dependencies {
                 // SQLDelight Native Driver
-                implementation("app.cash.sqldelight:native-driver:2.0.1")
+                implementation("app.cash.sqldelight:native-driver:2.0.2")
 
                 // Ktor iOS Client
-                implementation("io.ktor:ktor-client-darwin:2.3.7")
+                implementation("io.ktor:ktor-client-darwin:3.0.1")
             }
         }
     }
@@ -85,7 +86,7 @@ kotlin {
 
 android {
     namespace = "fr.unilim.stodolist.shared"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -98,10 +99,6 @@ android {
 
     buildFeatures {
         compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
     }
 }
 
